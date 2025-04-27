@@ -1,7 +1,14 @@
+import SideBar from "../components/dashboard/SideBar"
+import TopBar from "../components/dashboard/TopBar"
+
 const StatisticsPage = () => {
 
     return (
-        <div>StatisticsPage</div>
+        <>
+        <SideBar/>
+        <TopBar/>
+        
+        </>
     )
 }
 

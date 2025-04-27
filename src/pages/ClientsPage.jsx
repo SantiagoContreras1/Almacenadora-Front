@@ -1,7 +1,13 @@
- const ClientsPage = () => {
+import SideBar from "../components/dashboard/SideBar"
+import TopBar from "../components/dashboard/TopBar"
+const ClientsPage = () => {
 
     return (
-        <div>ClientsPage</div>
+        <>
+        <SideBar/>
+        <TopBar/>
+        
+        </>
     )
 }
 

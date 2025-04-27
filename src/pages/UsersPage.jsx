@@ -1,6 +1,14 @@
+
+import SideBar from "../components/dashboard/SideBar"
+import TopBar from "../components/dashboard/TopBar"
+
 const UsersPage = () => {
     return (
-        <div>UsersPage</div>
+        <>
+        <SideBar/>
+        <TopBar/>
+        
+        </>
     )
 }
 

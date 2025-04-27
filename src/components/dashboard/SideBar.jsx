@@ -3,12 +3,11 @@ import {
   Flex,
   Icon,
   Text,
-  Link,
   VStack,
   Divider,
-  Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { Link as RouterLink, useLocation } from "react-router-dom"; // Importamos useLocation
 import {
   FiHome,
   FiBox,
@@ -20,9 +19,11 @@ import {
   FiUser,
 } from "react-icons/fi";
 
-const NavItem = ({ icon, children, active }) => {
+const NavItem = ({ icon, children, to, active }) => {
   return (
     <Flex
+      as={RouterLink}
+      to={to}
       align="center"
       px="4"
       py="3"
@@ -36,6 +37,7 @@ const NavItem = ({ icon, children, active }) => {
       _hover={{
         bg: useColorModeValue("blue.400", "blue.500"),
         color: "white",
+        textDecoration: "none",
       }}
     >
       {icon && <Icon mr="2" boxSize="5" as={icon} transition=".15s ease" />}
@@ -44,16 +46,20 @@ const NavItem = ({ icon, children, active }) => {
   );
 };
 
-const SideBar = ({ active = "dashboard" }) => {
+const SideBar = () => {
+  const location = useLocation(); // usamos la ruta actual
+  const currentPath = location.pathname;
+
   const navItems = [
-    { name: "Dashboard", icon: FiHome, route: "dashboard" },
-    { name: "Inventario", icon: FiBox, route: "inventory" },
-    { name: "Movimientos", icon: FiRepeat, route: "movements" },
-    { name: "Proveedores", icon: FiBriefcase, route: "suppliers" },
-    { name: "Clientes", icon: FiUsers, route: "clients" },
-    { name: "Informes", icon: FiPieChart, route: "reports" },
-    { name: "Usuarios", icon: FiUser, route: "users" },
-    { name: "Configuración", icon: FiSettings, route: "settings" },
+    { name: "Dashboard", icon: FiHome, route: "/" },
+    { name: "Productos", icon: FiBox, route: "/products" },
+    { name: "Movimientos", icon: FiRepeat, route: "/movements" },
+    { name: "Proveedores", icon: FiBriefcase, route: "/suppliers" },
+    { name: "Clientes", icon: FiUsers, route: "/clients" },
+    { name: "Informes", icon: FiPieChart, route: "/reports" },
+    { name: "Estadísticas", icon: FiPieChart, route: "/statistics" },
+    { name: "Usuarios", icon: FiUser, route: "/users" },
+    { name: "Configuración", icon: FiSettings, route: "/settings" }, // esta ruta no la tienes, puedes crearla si quieres
   ];
 
   return (
@@ -84,7 +90,8 @@ const SideBar = ({ active = "dashboard" }) => {
           <NavItem
             key={item.name}
             icon={item.icon}
-            active={active === item.route}
+            to={item.route}
+            active={currentPath === item.route}
           >
             {item.name}
           </NavItem>

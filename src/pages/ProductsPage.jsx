@@ -1,8 +1,14 @@
+import SideBar from "../components/dashboard/SideBar"
+import TopBar from "../components/dashboard/TopBar"
+
 const ProductsPage = () => {
+  return (
+    <>
+        <SideBar/>
+        <TopBar/>
+        
+        </>
+  );
+};
 
-    return (
-        <div>ProductsPage</div>
-    )
-}
-
-export default ProductsPage
+export default ProductsPage;
