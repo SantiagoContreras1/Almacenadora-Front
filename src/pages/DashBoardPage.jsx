@@ -1,7 +1,15 @@
+import SideBar from "../components/dashboard/SideBar"
+import TopBar from "../components/dashboard/TopBar"
+import StatCard from "../components/dashboard/StatCard"
+
 const DashBoardPage = () => {
 
     return (
-        <div>DashBoardPage</div>
+        <>
+        <SideBar/>
+        <TopBar/>
+        
+        </>
     )
 }
 export default DashBoardPage
