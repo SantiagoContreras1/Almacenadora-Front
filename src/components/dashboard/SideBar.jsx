@@ -59,7 +59,7 @@ const SideBar = () => {
     { name: "Informes", icon: FiPieChart, route: "/reports" },
     { name: "Estadísticas", icon: FiPieChart, route: "/statistics" },
     { name: "Usuarios", icon: FiUser, route: "/users" },
-    { name: "Configuración", icon: FiSettings, route: "/settings" }, // esta ruta no la tienes, puedes crearla si quieres
+    { name: "Configuración", icon: FiSettings, route: "/settings" }
   ];
 
   return (
