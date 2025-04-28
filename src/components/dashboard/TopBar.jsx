@@ -1,3 +1,4 @@
+
 import {
   Flex,
   Input,
@@ -73,9 +74,11 @@ export const TopBar = () => {
           <MenuList>
             <MenuItem icon={<FiUser />}>Perfil</MenuItem>
             <MenuItem icon={<FiLogOut />} onClick={handleLogout}>Cerrar sesión</MenuItem>
+
           </MenuList>
         </Menu>
       </HStack>
     </Flex>
   );
 };
+

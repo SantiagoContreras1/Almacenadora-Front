@@ -10,3 +10,4 @@ const MovementsPage = () => {
 };
 
 export default MovementsPage;
+

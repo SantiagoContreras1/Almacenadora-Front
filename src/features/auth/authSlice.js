@@ -17,13 +17,16 @@ const authSlice = createSlice({
     },
     loadUserFromStorage(state) {
       const storedUser = localStorage.getItem("user");
+      console.log('Usuario almacenado en localStorage:', storedUser); 
       if (storedUser) {
         state.user = JSON.parse(storedUser);
+      } else {
+        state.user = null;
       }
     },
   },
 });
 
-export const { setUser, logout, loadUserFromStorage} = authSlice.actions;
-
+export const { setUser, logout, loadUserFromStorage } = authSlice.actions;
 export default authSlice.reducer;
+

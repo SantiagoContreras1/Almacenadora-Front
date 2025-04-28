@@ -48,6 +48,7 @@ const NavItem = ({ icon, children, to, active }) => {
 
 export const SideBar = () => {
   const { user } = useSelector((state) => state.auth);
+  console.log(user)
   const location = useLocation();
   const currentPath = location.pathname.substring(1) || "";
 
@@ -56,7 +57,7 @@ export const SideBar = () => {
   if(user.role == "ADMIN_ROLE"){
     navItems = [
       { name: "Dashboard", icon: FiHome, route: "" },
-      { name: "Inventario", icon: FiBox, route: "inventory" },
+      { name: "Inventario", icon: FiBox, route: "products" },
       { name: "Movimientos", icon: FiRepeat, route: "movements" },
       { name: "Proveedores", icon: FiBriefcase, route: "suppliers" },
       { name: "Clientes", icon: FiUsers, route: "clients" },
@@ -66,7 +67,7 @@ export const SideBar = () => {
   }else{
     navItems = [
       { name: "Dashboard", icon: FiHome, route: "" },
-      { name: "Inventario", icon: FiBox, route: "inventory" },
+      { name: "Inventario", icon: FiBox, route: "products" },
       { name: "Movimientos", icon: FiRepeat, route: "movements" },
       { name: "Proveedores", icon: FiBriefcase, route: "suppliers" },
       { name: "Clientes", icon: FiUsers, route: "clients" },
