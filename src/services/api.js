@@ -63,6 +63,17 @@ export const register = async (data) => {
   }
 };
 
+export const getProducts = async () => {
+  try {
+    return await apiClient.get("/products")
+  } catch (e) {
+    return {
+      error: true,
+      e
+    }
+  }
+}
+
 export const checkEmail = async (email) => {
     try {
        const response = await apiClient.get("/users/checkEmail", { params: {email}});
