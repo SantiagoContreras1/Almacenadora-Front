@@ -1,7 +1,13 @@
-const UsersPage = () => {
-    return (
-        <div>UsersPage</div>
-    )
-}
+import { SideBar } from "../components/dashboard/SideBar";
+import { TopBar } from "../components/dashboard/TopBar";
 
-export default UsersPage
+const UsersPage = () => {
+  return (
+    <>
+      <SideBar />
+      <TopBar />
+    </>
+  );
+};
+
+export default UsersPage;
