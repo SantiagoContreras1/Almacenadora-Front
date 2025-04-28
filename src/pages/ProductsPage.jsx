@@ -3,136 +3,123 @@ import {
   Box, SimpleGrid, Button, Input, Modal, ModalOverlay,
   ModalContent, ModalHeader, ModalBody, ModalFooter,
   ModalCloseButton, useDisclosure, Card, CardBody,
-  CardHeader, Image, Heading, Text, useToast
+  Heading, Text, useToast, Select, Image
 } from "@chakra-ui/react";
 import SideBar from "../components/dashboard/SideBar";
 import TopBar from "../components/dashboard/TopBar";
 
-const ProductsPage = () => {
+const InventoryPage = () => {
+  // Estados para los modales
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
-  const { isOpen: isMovementOpen, onOpen: onMovementOpen, onClose: onMovementClose } = useDisclosure();
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const toast = useToast();
 
+  // Estados para los datos
   const [products, setProducts] = useState([]);
-  const [searchTerm,] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [timer, setTimer] = useState(10);
+  const [productToDelete, setProductToDelete] = useState(null);
 
+  // Estado para nuevo producto
   const [newProduct, setNewProduct] = useState({
     name: "",
-    category: "",
-    stock: "",
-    supplier: "",
-    entryDate: "",
     description: "",
-    image: null,
-    movements: []
+    price: "",
+    stock: "",
+    proveedor: "",
+    category: "",
+    image: null
   });
 
   const [currentProductIndex, setCurrentProductIndex] = useState(null);
-  const [movementData, setMovementData] = useState({
-    type: "entrada",
-    quantity: "",
-    employee: "",
-    reason: "",
-    destination: ""
-  });
 
+  // Manejar cambios en los inputs
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
-      setNewProduct({ ...newProduct, image: URL.createObjectURL(files[0]) });
+      setNewProduct({ ...newProduct, image: files[0] });
     } else {
       setNewProduct({ ...newProduct, [name]: value });
     }
   };
 
+  // Guardar nuevo producto
   const handleSaveProduct = () => {
-
-
-    // Aquí Lima une el backend para guardar el producto
-
-
-    setProducts([...products, newProduct]);
+    // Aquí Lima agregará la conexión al backend
+    setProducts([...products, { ...newProduct, id: Date.now() }]);
     setNewProduct({
       name: "",
-      category: "",
-      stock: "",
-      supplier: "",
-      entryDate: "",
       description: "",
-      image: null,
-      movements: []
+      price: "",
+      stock: "",
+      proveedor: "",
+      category: "",
+      image: null
     });
     onClose();
+    toast({
+      title: "Producto registrado",
+      description: "El producto se ha agregado al inventario",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
+  // Editar producto existente
   const handleEditProduct = () => {
+    // Aquí Lima agregará la conexión al backend
     const updatedProducts = [...products];
     updatedProducts[currentProductIndex] = newProduct;
-
-    // Aquí Lima une el backend para actualizar el producto
-
-
     setProducts(updatedProducts);
-    setNewProduct({
-      name: "",
-      category: "",
-      stock: "",
-      supplier: "",
-      entryDate: "",
-      description: "",
-      image: null,
-      movements: []
-    });
-    setCurrentProductIndex(null);
     onEditClose();
+    toast({
+      title: "Producto actualizado",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
+  // Preparar edición de producto
   const handleOpenEdit = (index) => {
     setCurrentProductIndex(index);
     setNewProduct(products[index]);
     onEditOpen();
   };
 
-  const handleOpenMovement = (index) => {
-    setCurrentProductIndex(index);
-    onMovementOpen();
+  // Iniciar proceso de eliminación
+  const handleDeleteProduct = (index) => {
+    setProductToDelete(index);
+    setTimer(10);
+    onDeleteOpen();
   };
 
-  const handleSaveMovement = () => {
-    const updatedProducts = [...products];
-    const product = updatedProducts[currentProductIndex];
-
-    const movement = {
-      ...movementData,
-      date: new Date().toISOString()
-    };
-
-    if (movementData.type === "entrada") {
-      product.stock = Number(product.stock) + Number(movementData.quantity);
-    } else {
-      product.stock = Number(product.stock) - Number(movementData.quantity);
-    }
-
-    product.movements.push(movement);
-
-    // Aquí Lima une el backend para registrar el movimiento
-
-
+  // Confirmar eliminación de producto
+  const confirmDeleteProduct = () => {
+    // Aquí Lima agregará la conexión al backend
+    const updatedProducts = products.filter((_, i) => i !== productToDelete);
     setProducts(updatedProducts);
-    setMovementData({
-      type: "entrada",
-      quantity: "",
-      employee: "",
-      reason: "",
-      destination: ""
+    onDeleteClose();
+    toast({
+      title: "Producto eliminado",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
     });
-    setCurrentProductIndex(null);
-    onMovementClose();
   };
 
+  // Cancelar eliminación
+  const cancelDelete = () => {
+    onDeleteClose();
+    setTimer(10);
+  };
+
+  // Filtrar productos por búsqueda
   const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -140,29 +127,35 @@ const ProductsPage = () => {
       <SideBar />
       <TopBar />
       <Box ml="250px" p="5">
-        <Box mb="4" display="flex" justifyContent="space-between">
+        <Box mb="4" display="flex" justifyContent="space-between" alignItems="center">
           <Button colorScheme="teal" onClick={onOpen}>
-            Registrar Producto
+            Agregar Producto
           </Button>
+          <Input
+            placeholder="Buscar productos..."
+            width="auto"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </Box>
 
-        <SimpleGrid columns={[1, 2, 3]} spacing={5}>
+        <SimpleGrid columns={[1, 2, 3, 4]} spacing={5}>
           {filteredProducts.map((product, index) => (
             <Card key={index} boxShadow="md" _hover={{ boxShadow: "xl" }}>
-              {product.image ? (
-                <Image src={product.image} alt={product.name} borderTopRadius="md" />
-              ) : (
-                <Image
+              {product.image && (
+                <Image 
+                  src={product.image instanceof File ? URL.createObjectURL(product.image) : product.image}
+                  alt={product.name}
+                  objectFit="cover"
+                  height="200px"
                   borderTopRadius="md"
                 />
               )}
               <CardBody>
                 <Heading size="md" mb="2">{product.name}</Heading>
-                <Text>Categoría: {product.category}</Text>
-                <Text>Stock: {product.stock}</Text>
-                <Text>Proveedor: {product.supplier}</Text>
-                <Text>Fecha Entrada: {product.entryDate}</Text>
-                <Text mb="2">Descripción: {product.description}</Text> {/* Descripción mostrada */}
+                <Text mb="1">Precio: ${product.price}</Text>
+                <Text mb="1">Stock: {product.stock}</Text>
+                <Text mb="2" noOfLines={2}>{product.description}</Text>
 
                 <Box mt="4" display="flex" flexWrap="wrap" gap="2">
                   <Button size="sm" colorScheme="blue" onClick={() => handleOpenEdit(index)}>
@@ -171,41 +164,78 @@ const ProductsPage = () => {
                   <Button size="sm" colorScheme="red" onClick={() => handleDeleteProduct(index)}>
                     Eliminar
                   </Button>
-                  <Button size="sm" colorScheme="purple" onClick={() => handleOpenMovement(index)}>
-                    Movimientos
-                  </Button>
                 </Box>
-                
-                {/* Historial de Movimientos */}
-                {product.movements.length > 0 && (
-                  <Box mt="4">
-                    <Heading size="xs" mb="1">Historial:</Heading>
-                    {product.movements.map((m, idx) => (
-                      <Text key={idx} fontSize="xs">
-                        {m.type} - {m.quantity} unidades - {new Date(m.date).toLocaleDateString()} por {m.employee}
-                      </Text>
-                    ))}
-                  </Box>
-                )}
               </CardBody>
             </Card>
           ))}
         </SimpleGrid>
 
-        {/* Modal: Registrar Nuevo Producto */}
-        <Modal isOpen={isOpen} onClose={onClose}>
+        {/* Modal: Agregar Nuevo Producto */}
+        <Modal isOpen={isOpen} onClose={onClose} size="lg">
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Registrar Nuevo Producto</ModalHeader>
+            <ModalHeader>Agregar Nuevo Producto</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Input name="name" placeholder="Nombre del producto" mb="3" value={newProduct.name} onChange={handleChange} />
-              <Input name="category" placeholder="Categoría" mb="3" value={newProduct.category} onChange={handleChange} />
-              <Input name="stock" placeholder="Cantidad en stock" type="number" mb="3" value={newProduct.stock} onChange={handleChange} />
-              <Input name="supplier" placeholder="Proveedor" mb="3" value={newProduct.supplier} onChange={handleChange} />
-              <Input name="entryDate" placeholder="Fecha de entrada" type="date" mb="3" value={newProduct.entryDate} onChange={handleChange} />
-              <Input name="description" placeholder="Descripción del producto" mb="3" value={newProduct.description} onChange={handleChange} />
-              <Input name="image" type="file" accept="image/*" mb="3" onChange={handleChange} />
+              <Input 
+                name="name" 
+                placeholder="Nombre del producto" 
+                mb="3" 
+                value={newProduct.name} 
+                onChange={handleChange} 
+              />
+              <Input
+                name="description"
+                placeholder="Descripción"
+                mb="3"
+                value={newProduct.description}
+                onChange={handleChange}
+              />
+              <Input
+                name="price"
+                placeholder="Precio"
+                type="number"
+                mb="3"
+                value={newProduct.price}
+                onChange={handleChange}
+              />
+              <Input
+                name="stock"
+                placeholder="Cantidad en stock"
+                type="number"
+                mb="3"
+                value={newProduct.stock}
+                onChange={handleChange}
+              />
+              <Select
+                name="proveedor"
+                placeholder="Selecciona proveedor"
+                mb="3"
+                value={newProduct.proveedor}
+                onChange={handleChange}
+              >
+                {/* Aquí Lima agregará los proveedores del backend */}
+                <option value="proveedor1">Proveedor 1</option>
+                <option value="proveedor2">Proveedor 2</option>
+              </Select>
+              <Select
+                name="category"
+                placeholder="Selecciona categoría"
+                mb="3"
+                value={newProduct.category}
+                onChange={handleChange}
+              >
+                {/* Aquí Lima agregará las categorías del backend */}
+                <option value="categoria1">Categoría 1</option>
+                <option value="categoria2">Categoría 2</option>
+              </Select>
+              <Input
+                name="image"
+                type="file"
+                accept="image/*"
+                mb="3"
+                onChange={handleChange}
+              />
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="teal" mr={3} onClick={handleSaveProduct}>
@@ -217,19 +247,69 @@ const ProductsPage = () => {
         </Modal>
 
         {/* Modal: Editar Producto */}
-        <Modal isOpen={isEditOpen} onClose={onEditClose}>
+        <Modal isOpen={isEditOpen} onClose={onEditClose} size="lg">
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Editar Producto</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Input name="name" placeholder="Nombre del producto" mb="3" value={newProduct.name} onChange={handleChange} />
-              <Input name="category" placeholder="Categoría" mb="3" value={newProduct.category} onChange={handleChange} />
-              <Input name="stock" placeholder="Cantidad en stock" type="number" mb="3" value={newProduct.stock} onChange={handleChange} />
-              <Input name="supplier" placeholder="Proveedor" mb="3" value={newProduct.supplier} onChange={handleChange} />
-              <Input name="entryDate" placeholder="Fecha de entrada" type="date" mb="3" value={newProduct.entryDate} onChange={handleChange} />
-              <Input name="description" placeholder="Descripción del producto" mb="3" value={newProduct.description} onChange={handleChange} />
-              <Input name="image" type="file" accept="image/*" mb="3" onChange={handleChange} />
+              <Input 
+                name="name" 
+                placeholder="Nombre del producto" 
+                mb="3" 
+                value={newProduct.name} 
+                onChange={handleChange} 
+              />
+              <Input
+                name="description"
+                placeholder="Descripción"
+                mb="3"
+                value={newProduct.description}
+                onChange={handleChange}
+              />
+              <Input
+                name="price"
+                placeholder="Precio"
+                type="number"
+                mb="3"
+                value={newProduct.price}
+                onChange={handleChange}
+              />
+              <Input
+                name="stock"
+                placeholder="Cantidad en stock"
+                type="number"
+                mb="3"
+                value={newProduct.stock}
+                onChange={handleChange}
+              />
+              <Select
+                name="proveedor"
+                placeholder="Selecciona proveedor"
+                mb="3"
+                value={newProduct.proveedor}
+                onChange={handleChange}
+              >
+                <option value="proveedor1">Proveedor 1</option>
+                <option value="proveedor2">Proveedor 2</option>
+              </Select>
+              <Select
+                name="category"
+                placeholder="Selecciona categoría"
+                mb="3"
+                value={newProduct.category}
+                onChange={handleChange}
+              >
+                <option value="categoria1">Categoría 1</option>
+                <option value="categoria2">Categoría 2</option>
+              </Select>
+              <Input
+                name="image"
+                type="file"
+                accept="image/*"
+                mb="3"
+                onChange={handleChange}
+              />
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="blue" mr={3} onClick={handleEditProduct}>
@@ -240,38 +320,33 @@ const ProductsPage = () => {
           </ModalContent>
         </Modal>
 
-        {/* Modal: Registrar Movimiento */}
-        <Modal isOpen={isMovementOpen} onClose={onMovementClose}>
+        {/* Modal: Confirmar Eliminación */}
+        <Modal isOpen={isDeleteOpen} onClose={cancelDelete}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Registrar Movimiento</ModalHeader>
+            <ModalHeader>Confirmar Eliminación</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Input as="select" name="type" mb="3" value={movementData.type} onChange={(e) => setMovementData({ ...movementData, type: e.target.value })}>
-                <option value="entrada">Entrada</option>
-                <option value="salida">Salida</option>
-              </Input>
-              <Input name="quantity" placeholder="Cantidad" type="number" mb="3" value={movementData.quantity} onChange={(e) => setMovementData({ ...movementData, quantity: e.target.value })} />
-              <Input name="employee" placeholder="Empleado encargado" mb="3" value={movementData.employee} onChange={(e) => setMovementData({ ...movementData, employee: e.target.value })} />
-              {movementData.type === "salida" && (
-                <>
-                  <Input name="reason" placeholder="Motivo de salida" mb="3" value={movementData.reason} onChange={(e) => setMovementData({ ...movementData, reason: e.target.value })} />
-                  <Input name="destination" placeholder="Destino" mb="3" value={movementData.destination} onChange={(e) => setMovementData({ ...movementData, destination: e.target.value })} />
-                </>
-              )}
+              <Text fontSize="lg" mb="4" color="red.600" fontWeight="semibold">
+                ¿Estás seguro de eliminar este producto?
+              </Text>
+              <Text mb="4">
+                El producto se eliminará automáticamente en {timer} segundos...
+              </Text>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="purple" mr={3} onClick={handleSaveMovement}>
-                Guardar Movimiento
+              <Button colorScheme="red" mr={3} onClick={confirmDeleteProduct}>
+                Sí, eliminar ahora
               </Button>
-              <Button onClick={onMovementClose}>Cancelar</Button>
+              <Button onClick={cancelDelete}>
+                Cancelar
+              </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
-
       </Box>
     </>
   );
 };
 
-export default ProductsPage;
+export default InventoryPage;
