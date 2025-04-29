@@ -14,6 +14,7 @@ const ProductsPage = () => {
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
+
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -21,20 +22,40 @@ const ProductsPage = () => {
   } = useDisclosure();
 
   const [products, setProducts] = useState([]);
-  const { getProducts, isLoading } = useProducts();
+  const [productToEdit, setProductToEdit] = useState(null);
+
+  const { getProducts, saveProduct, isLoading, updateProduct } = useProducts();
+
+  const fetchProducts = async () => {
+    const productsFromApi = await getProducts();
+    if (productsFromApi) {
+      setProducts(productsFromApi);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const productsFromApi = await getProducts();
-      if (productsFromApi) {
-        setProducts(productsFromApi);
-      }
-    };
-    
-    fetchData();
+    fetchProducts();
   }, []);
 
-  
+  const handleSaveProduct = (data) => {
+    saveProduct(data)
+    fetchProducts();
+    onAddClose();
+  };
+
+  const handleOpenEdit = (product) => {
+    setProductToEdit(product);
+    onEditOpen();
+  };
+
+  const handleEditProduct = async (updatedProduct) => {
+    if (!productToEdit) return;
+
+    await updateProduct(productToEdit.uid, updatedProduct);
+    setProductToEdit(null);
+    onEditClose();
+    fetchProducts();
+  };
 
   return (
     <>
@@ -48,10 +69,11 @@ const ProductsPage = () => {
         </Box>
 
         <SimpleGrid columns={[1, 2, 3]} spacing={5}>
-          {products.map((product, index) => (
+          {products.map((product) => (
             <ProductCard
-              key={product.uid || index}
+              key={product.uid}
               product={product}
+              onEdit={() => handleOpenEdit(product)}
             />
           ))}
         </SimpleGrid>
@@ -59,12 +81,20 @@ const ProductsPage = () => {
         <AddProductModal
           isOpen={isAddOpen}
           onClose={onAddClose}
+          handleSaveProduct={handleSaveProduct}
         />
 
-        <EditProductModal
-          isOpen={isEditOpen}
-          onClose={onEditClose}
-        />
+        {productToEdit && (
+          <EditProductModal
+            isOpen={isEditOpen}
+            onClose={() => {
+              setProductToEdit(null);
+              onEditClose();
+            }}
+            product={productToEdit}
+            handleEditProduct={handleEditProduct}
+          />
+        )}
       </Box>
     </>
   );

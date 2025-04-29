@@ -95,6 +95,29 @@ export const editProduct = async (id, data) => {
   }
 };
 
+export const getSuppliers = async () => {
+  try {
+    return await apiClient.get('/proveedores');
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+}
+
+
+export const getCategories = async () => {
+  try {
+    return await apiClient.get('/categories');
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+}
+
 export const checkEmail = async (email) => {
   try {
     const response = await apiClient.get("/users/checkEmail", {
