@@ -1,15 +1,14 @@
-
-import SideBar from "../components/dashboard/SideBar"
-import TopBar from "../components/dashboard/TopBar"
+import { SideBar } from "../components/dashboard/SideBar";
+import { TopBar } from "../components/dashboard/TopBar";
 
 const UsersPage = () => {
-    return (
-        <>
-        <SideBar/>
-        <TopBar/>
-        
-        </>
-    )
-}
+  return (
+    <>
+      <SideBar />
+      <TopBar />
+    </>
+  );
+};
 
-export default UsersPage
+export default UsersPage;
+

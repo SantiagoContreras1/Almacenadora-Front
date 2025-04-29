@@ -1,15 +1,13 @@
-import SideBar from "../components/dashboard/SideBar"
-import TopBar from "../components/dashboard/TopBar"
+import { SideBar } from "../components/dashboard/SideBar";
+import { TopBar } from "../components/dashboard/TopBar";
 const MovementsPage = () => {
+  return (
+    <>
+      <SideBar />
+      <TopBar />
+    </>
+  );
+};
 
-    return (
-        <>
-        <SideBar/>
-        <TopBar/>
-        
-        </>
-        
-    )
-}
+export default MovementsPage;
 
-export default MovementsPage

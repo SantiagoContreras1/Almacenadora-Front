@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { useRegister } from "../../shared/hooks/useRegister";
 import {
   Center,
   Stack,
@@ -9,10 +10,10 @@ import {
   Input,
   FormControl,
   FormErrorMessage,
-  useToast,
   Card,
   Box,
 } from "@chakra-ui/react";
+import { checkEmail } from "../../services/api";
 
 export const Register = ({ toggleAuthMode }) => {
   const {
@@ -23,22 +24,13 @@ export const Register = ({ toggleAuthMode }) => {
   } = useForm({
     mode: "onChange",
   });
-
-  const toast = useToast();
+  const { registerUser, isLoading } = useRegister();
   const password = watch("password");
 
   const onSubmit = (data) => {
     console.log(data);
-    toast({
-      title: "Register successful!",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-
-    setTimeout(() => {
-      toggleAuthMode();
-    }, 1000);
+    registerUser(data.username, data.email, data.password);
+    toggleAuthMode()
   };
 
   return (
@@ -56,8 +48,8 @@ export const Register = ({ toggleAuthMode }) => {
         maxW="4xl"
         p="8"
         boxShadow="lg"
-        maxH="calc(100dvh - 2rem)" // <= el truco: que el Card nunca sea más alto que la pantalla
-        overflowY="auto" // <= solo el Card puede hacer scroll interno si es necesario
+        maxH="calc(100dvh - 2rem)"
+        overflowY="auto"
       >
         <Stack
           direction={{ base: "column", md: "row" }}
@@ -66,10 +58,7 @@ export const Register = ({ toggleAuthMode }) => {
           justify="center"
           w="full"
         >
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            style={{ width: "100%" }}
-          >
+          <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
             <VStack spacing="6" w={{ base: "full", md: "400px" }}>
               <Heading as="h1" size="lg" textAlign="center">
                 Register
@@ -100,6 +89,11 @@ export const Register = ({ toggleAuthMode }) => {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                       message: "Invalid email format",
                     },
+                    validate: async (email) => {
+                      const exists = await checkEmail(email);
+                      console.log(exists)
+                      return exists ? "Email already in use, Log In" : true;
+                    }
                   })}
                 />
                 <FormErrorMessage>
@@ -143,7 +137,8 @@ export const Register = ({ toggleAuthMode }) => {
                 type="submit"
                 colorScheme="purple"
                 width="full"
-                isDisabled={!isValid}
+                isDisabled={!isValid || isLoading}
+                isLoading={isLoading}
               >
                 Register
               </Button>

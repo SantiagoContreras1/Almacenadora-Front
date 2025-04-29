@@ -8,11 +8,10 @@ import {
   Input,
   FormControl,
   FormErrorMessage,
-  useToast,
   Card,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useLogin } from "../../shared/hooks/useLogin";
 
 export const Login = ({ toggleAuthMode }) => {
   const {
@@ -22,29 +21,10 @@ export const Login = ({ toggleAuthMode }) => {
   } = useForm({
     mode: "onChange",
   });
-  const toast = useToast();
-  const navigate = useNavigate();
+  const { login, isLoading } = useLogin();
 
   const onSubmit = (data) => {
-    const { email, password } = data;
-
-    if (email === "admin@example.com" && password === "admin123") {
-      localStorage.setItem("token", "fake-token");
-      toast({
-        title: "Login successful!",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-      navigate("/products");
-    } else {
-      toast({
-        title: "Invalid credentials.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
+    login(data.email, data.password);
   };
 
   return (
@@ -98,7 +78,8 @@ export const Login = ({ toggleAuthMode }) => {
                 type="submit"
                 colorScheme="purple"
                 width="full"
-                isDisabled={!isValid}
+                isDisabled={!isValid || isLoading}
+                isLoading={isLoading}
               >
                 Sign in
               </Button>

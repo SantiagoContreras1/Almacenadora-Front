@@ -12,16 +12,23 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  useColorModeValue
-} from '@chakra-ui/react';
-import { 
-  FiSearch, 
-  FiUser, 
-  FiSettings, 
-  FiLogOut 
-} from 'react-icons/fi';
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { FiSearch, FiUser, FiSettings, FiLogOut } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
-const TopBar = ({ username = "Carlos Rodríguez", role = "Administrador" }) => {
+export const TopBar = () => {
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    navigate('/auth')
+    dispatch(logout())
+    
+  }
   return (
     <Flex
       as="header"
@@ -42,8 +49,8 @@ const TopBar = ({ username = "Carlos Rodríguez", role = "Administrador" }) => {
         <InputLeftElement pointerEvents="none">
           <FiSearch color="gray.300" />
         </InputLeftElement>
-        <Input 
-          placeholder="Buscar productos, proveedores..." 
+        <Input
+          placeholder="Buscar productos, proveedores..."
           borderRadius="md"
           _focus={{ borderColor: "blue.500" }}
         />
@@ -53,17 +60,21 @@ const TopBar = ({ username = "Carlos Rodríguez", role = "Administrador" }) => {
         <Menu>
           <MenuButton>
             <HStack spacing="2">
-              <Avatar size="sm" name={username} bg="blue.500" />
+              <Avatar size="sm" name={user.name} bg="blue.500" />
               <Box display={{ base: "none", md: "block" }}>
-                <Text fontWeight="medium" fontSize="sm">{username}</Text>
-                <Text fontSize="xs" color="gray.500">{role}</Text>
+                <Text fontWeight="medium" fontSize="sm">
+                  {user.name}
+                </Text>
+                <Text fontSize="xs" color="gray.500">
+                  {user.role === "ADMIN_ROLE" ? 'Administrador' : 'Empleado' }
+                </Text>
               </Box>
             </HStack>
           </MenuButton>
           <MenuList>
             <MenuItem icon={<FiUser />}>Perfil</MenuItem>
-            <MenuItem icon={<FiSettings />}>Configuración</MenuItem>
-            <MenuItem icon={<FiLogOut />}>Cerrar sesión</MenuItem>
+            <MenuItem icon={<FiLogOut />} onClick={handleLogout}>Cerrar sesión</MenuItem>
+
           </MenuList>
         </Menu>
       </HStack>
@@ -71,4 +82,3 @@ const TopBar = ({ username = "Carlos Rodríguez", role = "Administrador" }) => {
   );
 };
 
-export default TopBar;
