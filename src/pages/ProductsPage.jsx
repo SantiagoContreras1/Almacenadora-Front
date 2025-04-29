@@ -21,20 +21,7 @@ const ProductsPage = () => {
   } = useDisclosure();
 
   const [products, setProducts] = useState([]);
-  const [searchTerm] = useState("");
   const { getProducts, isLoading } = useProducts();
-  const [currentProductIndex, setCurrentProductIndex] = useState(null);
-
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    category: "",
-    stock: "",
-    supplier: "",
-    entryDate: "",
-    description: "",
-    image: null
-  });
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,48 +30,11 @@ const ProductsPage = () => {
         setProducts(productsFromApi);
       }
     };
-
+    
     fetchData();
   }, []);
 
-  const handleSaveProduct = () => {
-    setProducts([...products, newProduct]);
-    resetProductForm();
-    onAddClose();
-  };
-
-  const handleEditProduct = () => {
-    const updatedProducts = [...products];
-    updatedProducts[currentProductIndex] = newProduct;
-    setProducts(updatedProducts);
-    resetProductForm();
-    onEditClose();
-  };
-
-  const handleOpenEdit = (index) => {
-    setCurrentProductIndex(index);
-    setNewProduct(products[index]);
-    onEditOpen();
-  };
-
-
-  const resetProductForm = () => {
-    setNewProduct({
-      name: "",
-      category: "",
-      stock: "",
-      supplier: "",
-      entryDate: "",
-      description: "",
-      image: null,
-    });
-    setCurrentProductIndex(null);
-  };
-
-
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  
 
   return (
     <>
@@ -98,12 +48,10 @@ const ProductsPage = () => {
         </Box>
 
         <SimpleGrid columns={[1, 2, 3]} spacing={5}>
-          {filteredProducts.map((product, index) => (
+          {products.map((product, index) => (
             <ProductCard
               key={product.uid || index}
               product={product}
-              onEdit={() => handleOpenEdit(index)}
-              onMovement={() => handleOpenMovement(index)}
             />
           ))}
         </SimpleGrid>
@@ -111,17 +59,11 @@ const ProductsPage = () => {
         <AddProductModal
           isOpen={isAddOpen}
           onClose={onAddClose}
-          newProduct={newProduct}
-          setNewProduct={setNewProduct}
-          handleSaveProduct={handleSaveProduct}
         />
 
         <EditProductModal
           isOpen={isEditOpen}
           onClose={onEditClose}
-          newProduct={newProduct}
-          setNewProduct={setNewProduct}
-          handleEditProduct={handleEditProduct}
         />
       </Box>
     </>
