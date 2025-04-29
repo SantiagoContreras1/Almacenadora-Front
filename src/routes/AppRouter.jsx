@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { Spinner, Center } from "@chakra-ui/react";
 
@@ -14,26 +14,24 @@ export const AppRouter = () => {
   const AuthPage = lazy(() => import("../pages/AuthPage"));
 
   return (
-    <Router>
-      <Suspense
-        fallback={
-          <Center h="100vh">
-            <Spinner size="xl" color="blue.500" />
-          </Center>
-        }
-      >
-        <Routes>
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/suppliers" element={<SuppliersPage />} />
-          <Route path="/clients" element={<ClientsPage />} />
-          <Route path="/movements" element={<MovementsPage />} />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/statistics" element={<StatisticsPage />} />
-          <Route path="/users" element={<UsersPage />} />
-          <Route path="/" element={<DashBoardPage />} />
-        </Routes>
-      </Suspense>
-    </Router>
+    <Suspense
+      fallback={
+        <Center h="100vh">
+          <Spinner size="xl" color="blue.500" />
+        </Center>
+      }
+    >
+      <Routes>
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/suppliers" element={<SuppliersPage />} />
+        <Route path="/clients" element={<ClientsPage />} />
+        <Route path="/movements" element={<MovementsPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/statistics" element={<StatisticsPage />} />
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/" element={<DashBoardPage />} />
+      </Routes>
+    </Suspense>
   );
 };

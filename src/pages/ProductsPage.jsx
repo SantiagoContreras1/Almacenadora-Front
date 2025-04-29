@@ -14,6 +14,7 @@ const ProductsPage = () => {
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
+
   const {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
@@ -21,70 +22,40 @@ const ProductsPage = () => {
   } = useDisclosure();
 
   const [products, setProducts] = useState([]);
-  const [searchTerm] = useState("");
-  const { getProducts, isLoading } = useProducts();
-  const [currentProductIndex, setCurrentProductIndex] = useState(null);
+  const [productToEdit, setProductToEdit] = useState(null);
 
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    category: "",
-    stock: "",
-    supplier: "",
-    entryDate: "",
-    description: "",
-    image: null
-  });
+  const { getProducts, saveProduct, isLoading, updateProduct } = useProducts();
 
+  const fetchProducts = async () => {
+    const productsFromApi = await getProducts();
+    if (productsFromApi) {
+      setProducts(productsFromApi);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const productsFromApi = await getProducts();
-      if (productsFromApi) {
-        setProducts(productsFromApi);
-      }
-    };
-
-    fetchData();
+    fetchProducts();
   }, []);
 
-  const handleSaveProduct = () => {
-    setProducts([...products, newProduct]);
-    resetProductForm();
+  const handleSaveProduct = (data) => {
+    saveProduct(data)
+    fetchProducts();
     onAddClose();
   };
 
-  const handleEditProduct = () => {
-    const updatedProducts = [...products];
-    updatedProducts[currentProductIndex] = newProduct;
-    setProducts(updatedProducts);
-    resetProductForm();
-    onEditClose();
-  };
-
-  const handleOpenEdit = (index) => {
-    setCurrentProductIndex(index);
-    setNewProduct(products[index]);
+  const handleOpenEdit = (product) => {
+    setProductToEdit(product);
     onEditOpen();
   };
 
+  const handleEditProduct = async (updatedProduct) => {
+    if (!productToEdit) return;
 
-  const resetProductForm = () => {
-    setNewProduct({
-      name: "",
-      category: "",
-      stock: "",
-      supplier: "",
-      entryDate: "",
-      description: "",
-      image: null,
-    });
-    setCurrentProductIndex(null);
+    await updateProduct(productToEdit.uid, updatedProduct);
+    setProductToEdit(null);
+    onEditClose();
+    fetchProducts();
   };
-
-
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <>
@@ -98,12 +69,11 @@ const ProductsPage = () => {
         </Box>
 
         <SimpleGrid columns={[1, 2, 3]} spacing={5}>
-          {filteredProducts.map((product, index) => (
+          {products.map((product) => (
             <ProductCard
-              key={product.uid || index}
+              key={product.uid}
               product={product}
-              onEdit={() => handleOpenEdit(index)}
-              onMovement={() => handleOpenMovement(index)}
+              onEdit={() => handleOpenEdit(product)}
             />
           ))}
         </SimpleGrid>
@@ -111,18 +81,20 @@ const ProductsPage = () => {
         <AddProductModal
           isOpen={isAddOpen}
           onClose={onAddClose}
-          newProduct={newProduct}
-          setNewProduct={setNewProduct}
           handleSaveProduct={handleSaveProduct}
         />
 
-        <EditProductModal
-          isOpen={isEditOpen}
-          onClose={onEditClose}
-          newProduct={newProduct}
-          setNewProduct={setNewProduct}
-          handleEditProduct={handleEditProduct}
-        />
+        {productToEdit && (
+          <EditProductModal
+            isOpen={isEditOpen}
+            onClose={() => {
+              setProductToEdit(null);
+              onEditClose();
+            }}
+            product={productToEdit}
+            handleEditProduct={handleEditProduct}
+          />
+        )}
       </Box>
     </>
   );

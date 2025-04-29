@@ -17,39 +17,38 @@ export const login = async (data) => {
 };
 
 export const getUserById = async (id) => {
-    try {
-        return await apiClient.get(`/users/${id}`);
-      } catch (e) {
-        return {
-          error: true,
-          e,
-        };
-      }
-}
+  try {
+    return await apiClient.get(`/users/${id}`);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
 
 apiClient.interceptors.request.use(
-    (config) => {
-      const userDetails = localStorage.getItem("user");
-  
-      if (userDetails) {
-        try {
-          const { token } = JSON.parse(userDetails);
-  
-          if (token) {
-            config.headers["x-token"] = token;
-          }
-        } catch (error) {
-          console.error("Error parsing user data from localStorage", error);
+  (config) => {
+    const userDetails = localStorage.getItem("user");
+
+    if (userDetails) {
+      try {
+        const { token } = JSON.parse(userDetails);
+
+        if (token) {
+          config.headers["x-token"] = token;
         }
+      } catch (error) {
+        console.error("Error parsing user data from localStorage", error);
       }
-  
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
     }
-  );
-  
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export const register = async (data) => {
   try {
@@ -65,24 +64,71 @@ export const register = async (data) => {
 
 export const getProducts = async () => {
   try {
-    return await apiClient.get("/products")
+    return await apiClient.get("/products");
   } catch (e) {
     return {
       error: true,
-      e
-    }
+      e,
+    };
+  }
+};
+
+export const saveProduct = async (data) => {
+  try {
+    return await apiClient.post("/products/save/", data);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const editProduct = async (id, data) => {
+  try {
+    return await apiClient.post(`/products/update/${id}`, data);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const getSuppliers = async () => {
+  try {
+    return await apiClient.get('/proveedores');
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+}
+
+
+export const getCategories = async () => {
+  try {
+    return await apiClient.get('/categories');
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
   }
 }
 
 export const checkEmail = async (email) => {
-    try {
-       const response = await apiClient.get("/users/checkEmail", { params: {email}});
-       return response.data.exists
-      } catch (e) {
-        console.log(e);
-        return {
-          error: true,
-          e,
-        };
-      }
-}
+  try {
+    const response = await apiClient.get("/users/checkEmail", {
+      params: { email },
+    });
+    return response.data.exists;
+  } catch (e) {
+    console.log(e);
+    return {
+      error: true,
+      e,
+    };
+  }
+};

@@ -7,53 +7,50 @@ import {
   Box,
   Button,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
-export const ProductCard = ({ product, onEdit, onMovement }) => {
+export const ProductCard = ({ product, onEdit, onDelete }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/producto/${product.uid}`);
+  };
+
   return (
-    <Card boxShadow="md" _hover={{ boxShadow: "xl" }}>
-      {product.image ? (
-        <Image
-          src={product.image}
-          alt={product.name}
-          borderTopRadius="md"
-        />
-      ) : (
-        <Image borderTopRadius="md" />
-      )}
-      <CardBody>
-        <Heading size="md" mb="2">
-          {product.name}
-        </Heading>
-        <Text>Categoría: {product.category}</Text>
-        <Text>Stock: {product.stock}</Text>
-        <Text>Proveedor: {product.supplier}</Text>
-        <Text>Fecha Entrada: {product.entrada || product.entryDate}</Text>
-        <Text mb="2">Descripción: {product.description}</Text>
-        
-        <Box mt="4" display="flex" flexWrap="wrap" gap="2">
-          <Button
-            size="sm"
-            colorScheme="blue"
-            onClick={onEdit}
-          >
+    <Card
+      maxW="sm"
+      boxShadow="md"
+      _hover={{ boxShadow: "xl" }}
+      transition="0.2s"
+    >
+      <CardBody p="3">
+        <Box onClick={handleCardClick} cursor="pointer">
+          <Image
+            src={product.imageUrl || "https://via.placeholder.com/150"}
+            alt={product.name}
+            borderRadius="md"
+            mb="2"
+            objectFit="cover"
+            height="150px"
+            width="100%"
+          />
+          <Heading size="sm" noOfLines={1} mb="1">
+            {product.name}
+          </Heading>
+          <Text fontWeight="bold" color="teal.500">
+            Q{product.price?.toFixed(2) || "0.00"}
+          </Text>
+        </Box>
+
+        <Box mt="3" display="flex" justifyContent="space-between">
+          <Button size="sm" colorScheme="blue" onClick={onEdit}>
             Editar
           </Button>
-          <Button
-            size="sm"
-            colorScheme="red"
-          >
+          <Button size="sm" colorScheme="red" onClick={onDelete}>
             Eliminar
-          </Button>
-          <Button
-            size="sm"
-            colorScheme="purple"
-            onClick={onMovement}
-          >
-            Movimientos
           </Button>
         </Box>
       </CardBody>
     </Card>
   );
 };
-

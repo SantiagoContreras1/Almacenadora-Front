@@ -27,22 +27,20 @@ export const useLogin = () => {
         duration: 2000,
         isClosable: true,
       });
-      setIsLoading(false); 
+      setIsLoading(false);
       return;
     }
 
     const token = response.data.token;
-
     const decoded = jwtDecode(token);
-
     const userId = decoded?.uid;
 
     const res = await getUserById(userId);
-
     const user = res.data.user;
 
     dispatch(setUser(user));
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("user", JSON.stringify({ ...user, token })); // ← ✅ AQUÍ
+
     setIsLoading(false);
     toast({
       title: "Login successful",
