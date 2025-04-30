@@ -10,7 +10,6 @@ export const useRegister = () => {
     setIsLoading(true);
 
     const response = await registerRequest({ name, email, password });
-    console.log(response)
     setIsLoading(false);
 
     if (response.error) {
