@@ -53,7 +53,7 @@ const ReportsPage = () => {
             Panel de Informes y Estadísticas
           </Heading>
 
-          <ExpandableSection title="🔴 Alerta: Productos con Stock Bajo">
+          <ExpandableSection title="🚨 Alerta: Productos con Stock Bajo">
             <LowStockAlert products={lowStockProducts} />
           </ExpandableSection>
 
