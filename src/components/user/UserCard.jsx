@@ -1,57 +1,69 @@
-import { Box, Text, Stack } from "@chakra-ui/react";
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from 'uuid';
+import {
+  SimpleGrid,
+  Card,
+  CardBody,
+  Heading,
+  Text,
+  Box,
+  Button,
+  CardFooter,
+  VStack,
+  HStack,
+  Badge,
+  Avatar
+} from "@chakra-ui/react";
+ 
+export const UserCard = ({ users, onEdit, onMovement }) => {    
+  const user = {
+    name: "Usuario de Prueba",
+    email: "prueba@ejemplo.com",
+    role: "Editor",
+    estado: "Activo",
+  };
 
-export const UserCard = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const staticUsers = [
-      { id: 1, name: "Jassie Bhatia", email: "jassie@jassie.dev", role: "Admin" },
-      { id: 2, name: "John Doe", email: "john@example.com", role: "User" },
-      { id: 3, name: "Alice Smith", email: "alice@smith.com", role: "Manager" },
-    ];
-
-    setUsers(staticUsers);
-    setLoading(false);
-  }, []);
-
-  if (loading) return <div>Cargando...</div>;
-  if (users.length === 0) return <div>No se encontraron usuarios</div>;
-
+  const userToDisplay = user;
+  const randomSeed = uuidv4();
+  const avatarUrl = `https://api.dicebear.com/7.x/adventurer/svg?seed=${randomSeed}`;
+  const statusColor = userToDisplay.estado === 'Activo' ? 'green' : 'red';
+  
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 3 }}
-      transition={{ duration: 1 }}
-    >
-      <Box
-        borderWidth="6px"
-        borderColor="#ffddae"
+    <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(250px, 1fr))'>
+      <Card
+        boxShadow="lg"
         borderRadius="lg"
-        p={6}
-        maxW="lg"
-        boxShadow="md"
+        overflow="hidden"
+        _hover={{ boxShadow: "dark-lg", transform: "translateY(-5px)" }}
+        transition="all 0.2s ease-in-out"
       >
-        <Stack spacing={4}>
-          {users.map((user) => (
-            <Box
-              key={user.id}
-              p={5}
-              borderWidth="5px"
-              borderColor="#c6e7ff"
-              borderRadius="md"
-              mb={2}
-            >
-              <Text fontFamily="mono" fontWeight="bold" fontSize="20" color="#da627d">Name: {user.name}</Text>
-              <Text fontFamily="mono" fontSize="14" fontStyle="italic">Email: {user.email}</Text>
-              <Text fontFamily="mono" fontSize="14" fontStyle="italic">Role: {user.role}</Text>
-            </Box>
-          ))}
-        </Stack>
-      </Box>
-    </motion.div>
+        <CardBody>
+          <Text fontSize="2xl" fontWeight="bold" color="gray.800" mb="5">💼</Text>
+          <VStack spacing={4} align="stretch"> 
+          <Avatar src={avatarUrl} size="lg" mb="2" />
+
+            <Heading size="md">
+              {userToDisplay.name}
+            </Heading>
+
+            <Text pb="1" borderBottom="1px solid" fontStyle="italic" fontWeight="semibold" fontSize="sm" color="gray.600">
+              Email: {userToDisplay.email}
+            </Text>
+            <Text pb="1" borderBottom="1px solid" fontStyle="italic" fontWeight="semibold" fontSize="sm" color="gray.600">
+              Role: {userToDisplay.role}
+            </Text>
+
+            <HStack justifyContent="space-between" alignItems="center">
+              <Text pb="1"  fontStyle="italic" fontWeight="semibold" fontSize="sm" color="gray.600">
+                Estado:
+              </Text>
+              <Badge colorScheme={statusColor} variant="solid" borderRadius="full" px="2">
+                {userToDisplay.estado}
+              </Badge>
+            </HStack>
+          </VStack>
+        </CardBody>
+      </Card>
+    </SimpleGrid>
   );
 };
 
