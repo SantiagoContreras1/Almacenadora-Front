@@ -8,10 +8,9 @@ const ClientsPage = () => {
         <>
         <SideBar/>
         <TopBar/>
-        <Box ml="350px" p="50">
+        <Box ml="200px" p="50">
             <UserCard/>
         </Box>
-
         </>
     )
 }

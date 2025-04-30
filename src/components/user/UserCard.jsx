@@ -1,4 +1,5 @@
 import { Box, Text, Stack } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
 export const UserCard = () => {
@@ -20,17 +21,37 @@ export const UserCard = () => {
   if (users.length === 0) return <div>No se encontraron usuarios</div>;
 
   return (
-    <Box borderWidth="8px" borderRadius="lg" p={4} maxW="md">
-      <Stack spacing={4}>
-        {users.map((user) => (
-          <Box key={user.id}>
-            <Text fontWeight="bold">Name: {user.name}</Text>
-            <Text>Email: {user.email}</Text>
-            <Text>Role: {user.role}</Text>
-          </Box>
-        ))}
-      </Stack>
-    </Box>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 3 }}
+      transition={{ duration: 1 }}
+    >
+      <Box
+        borderWidth="6px"
+        borderColor="#ffddae"
+        borderRadius="lg"
+        p={6}
+        maxW="lg"
+        boxShadow="md"
+      >
+        <Stack spacing={4}>
+          {users.map((user) => (
+            <Box
+              key={user.id}
+              p={5}
+              borderWidth="5px"
+              borderColor="#c6e7ff"
+              borderRadius="md"
+              mb={2}
+            >
+              <Text fontFamily="mono" fontWeight="bold" fontSize="20" color="#da627d">Name: {user.name}</Text>
+              <Text fontFamily="mono" fontSize="14" fontStyle="italic">Email: {user.email}</Text>
+              <Text fontFamily="mono" fontSize="14" fontStyle="italic">Role: {user.role}</Text>
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+    </motion.div>
   );
 };
 
