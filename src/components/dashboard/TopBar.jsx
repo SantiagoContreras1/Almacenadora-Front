@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 
-export const TopBar = () => {
+export const TopBar = ({isSearch, handleChange}) => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -44,17 +44,19 @@ export const TopBar = () => {
       <Text fontSize="xl" fontWeight="bold">
         Dashboard
       </Text>
-
-      <InputGroup w="96" maxW="400px">
+      
+      {isSearch ? (<InputGroup w="96" maxW="400px">
         <InputLeftElement pointerEvents="none">
           <FiSearch color="gray.300" />
         </InputLeftElement>
         <Input
-          placeholder="Buscar productos, proveedores..."
+          placeholder="Search"
+          onChange={(e)=> handleChange(e.target.value)}
           borderRadius="md"
           _focus={{ borderColor: "blue.500" }}
         />
-      </InputGroup>
+      </InputGroup>) : (<></>) }
+      
 
       <HStack spacing="4">
         <Menu>

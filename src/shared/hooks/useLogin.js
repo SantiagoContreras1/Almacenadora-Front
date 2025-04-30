@@ -39,7 +39,7 @@ export const useLogin = () => {
     const user = res.data.user;
 
     dispatch(setUser(user));
-    localStorage.setItem("user", JSON.stringify({ ...user, token })); // ← ✅ AQUÍ
+    localStorage.setItem("user", JSON.stringify({ ...user, token }));
 
     setIsLoading(false);
     toast({

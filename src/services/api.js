@@ -62,9 +62,9 @@ export const register = async (data) => {
   }
 };
 
-export const getProducts = async () => {
+export const getProducts = async (name,category,entrada) => {
   try {
-    return await apiClient.get("/products");
+    return await apiClient.get("/products", {params: name, category, entrada });
   } catch (e) {
     return {
       error: true,
@@ -86,7 +86,18 @@ export const saveProduct = async (data) => {
 
 export const editProduct = async (id, data) => {
   try {
-    return await apiClient.post(`/products/update/${id}`, data);
+    return await apiClient.put(`/products/update/${id}`, data);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const deleteProduct = async (id) => {
+  try {
+    return await apiClient.delete(`/products/delete/${id}`);
   } catch (e) {
     return {
       error: true,
