@@ -48,7 +48,6 @@ const NavItem = ({ icon, children, to, active }) => {
 
 export const SideBar = () => {
   const { user } = useSelector((state) => state.auth);
-  console.log(user)
   const location = useLocation();
   const currentPath = location.pathname.substring(1) || "";
 

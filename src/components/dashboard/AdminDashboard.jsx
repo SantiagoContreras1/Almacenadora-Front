@@ -20,6 +20,7 @@ import { ProductsTable } from "./ProductsTable";
 import { SideBar } from "./SideBar";
 import { StatCard } from "./StatCard";
 import { TopBar } from "./TopBar";
+import AlertaPanel from "../AlertaPanel"
 
 const productData = [
   {
@@ -150,11 +151,13 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
 const AdminDashboard = () => {
   return (
+    
     <Flex h="100vh" bg={useColorModeValue("gray.50", "gray.900")}>
       <SideBar active="dashboard" />
-
+     
       <Box ml="64" flex="1" p="6" overflow="auto">
         <TopBar />
+        <AlertaPanel/>
 
         <Grid
           templateColumns={{

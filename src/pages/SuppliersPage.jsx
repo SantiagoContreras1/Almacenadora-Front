@@ -1,5 +1,4 @@
-import { SideBar } from "../components/dashboard/SideBar";
-import { TopBar } from "../components/dashboard/TopBar";
+import { useState, useEffect } from "react";
 import {
   Box,
   Heading,
@@ -27,62 +26,95 @@ import {
   Card,
   CardHeader,
   CardBody,
-  SimpleGrid
+  SimpleGrid,
+  Select,
+  useToast
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { SideBar } from "../components/dashboard/SideBar";
+import { TopBar } from "../components/dashboard/TopBar";
+import { FaTruck, FaSearch, FaPlus } from "react-icons/fa";
 import SupplierForm from "../components/suppliers/SupplierForm";
 import SupplierList from "../components/suppliers/SupplierList";
-import { FaTruck, FaSearch, FaPlus, FaFilter, FaRegEdit, FaTrashAlt } from "react-icons/fa";
+import { useSuppliers } from "../shared/hooks/useSuppliers";
 
 const SuppliersPage = () => {
-  const [suppliers, setSuppliers] = useState([
-    {
-      id: 1,
-      nombre: "Distribuidora ACME",
-      contacto: "Juan Pérez",
-      email: "juan@acme.com",
-      telefono: "555-1234",
-      direccion: "Av. Principal 123",
-      categoria: "Electrónicos"
-    },
-    {
-      id: 2,
-      nombre: "Suministros Industriales",
-      contacto: "María García",
-      email: "maria@suministros.com",
-      telefono: "555-5678",
-      direccion: "Calle Secundaria 456",
-      categoria: "Herramientas"
-    }
-  ]);
-
+  const [suppliers, setSuppliers] = useState([]);
   const [search, setSearch] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const toast = useToast();
 
   const bg = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
   const titleColor = useColorModeValue("teal.600", "teal.300");
   const borderColor = useColorModeValue("gray.200", "gray.600");
 
-  const handleAddSupplier = (newSupplier) => {
-    setSuppliers([...suppliers, { ...newSupplier, id: Date.now() }]);
+  const { getSuppliers, saveSupplier, updateSupplier, deleteSupplier } = useSuppliers();
+
+  const fetchData = async () => {
+    const suppliersFromApi = await getSuppliers();
+    if (suppliersFromApi) {
+      setSuppliers(suppliersFromApi);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleSave = async (data) => {
+    if (selectedSupplier) {
+      await updateSupplier(selectedSupplier.uid, data);
+      toast({
+        title: "Proveedor actualizado",
+        description: "El proveedor ha sido actualizado con éxito.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-right",
+      });
+    } else {
+      await saveSupplier(data);
+      toast({
+        title: "Proveedor agregado",
+        description: "El proveedor ha sido registrado con éxito.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-right",
+      });
+    }
+    fetchData();
     onClose();
   };
 
-  const handleEditSupplier = (updatedSupplier) => {
-    setSuppliers(suppliers.map(s => s.id === updatedSupplier.id ? updatedSupplier : s));
+  const handleEdit = (supplier) => {
+    setSelectedSupplier(supplier);
+    onOpen();
+  };
+
+  const handleDelete = async (id, name) => {
+    await deleteSupplier(id);
+    fetchData();
+    toast({
+      title: "Proveedor eliminado",
+      description: `${name} ha sido eliminado correctamente.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+      position: "bottom-right",
+    });
+  };
+
+  const handleOpenCreate = () => {
     setSelectedSupplier(null);
-    onClose();
-  };
-
-  const handleDeleteSupplier = (id) => {
-    setSuppliers(suppliers.filter(s => s.id !== id));
+    onOpen();
   };
 
   const filteredSuppliers = suppliers.filter((supplier) =>
     supplier.nombre?.toLowerCase().includes(search.toLowerCase()) ||
-    supplier.contacto?.toLowerCase().includes(search.toLowerCase())
+    supplier.contacto?.toLowerCase().includes(search.toLowerCase()) ||
+    supplier.email?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -91,7 +123,6 @@ const SuppliersPage = () => {
       <Box ml={{ base: 0, md: 60 }} transition="0.3s ease">
         <TopBar />
         <Box p={{ base: 4, md: 8 }}>
-          {/* Encabezado con acciones */}
           <Flex justify="space-between" align="center" mb={8}>
             <HStack spacing={4}>
               <Icon as={FaTruck} boxSize={8} color={titleColor} />
@@ -106,22 +137,18 @@ const SuppliersPage = () => {
             <Button
               leftIcon={<FaPlus />}
               colorScheme="teal"
-              onClick={() => {
-                setSelectedSupplier(null);
-                onOpen();
-              }}
+              onClick={handleOpenCreate}
             >
               Nuevo Proveedor
             </Button>
           </Flex>
 
-          {/* Barra de búsqueda */}
           <Card mb={8} border="1px" borderColor={borderColor}>
             <CardBody>
               <Flex direction={{ base: "column", md: "row" }} gap={4}>
                 <InputGroup flex="1">
                   <Input
-                    placeholder="Buscar proveedor por nombre o contacto..."
+                    placeholder="Buscar proveedor por nombre, contacto o email..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     borderRadius="lg"
@@ -139,30 +166,6 @@ const SuppliersPage = () => {
             </CardBody>
           </Card>
 
-
-          {/* Resumen estadístico */}
-          <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} gap={6} mb={8}>
-            <Card bg={cardBg} boxShadow="sm" borderRadius="lg">
-              <CardBody>
-                <Text fontSize="sm" color="gray.500">Proveedores Activos</Text>
-                <Heading size="lg">{suppliers.length}</Heading>
-              </CardBody>
-            </Card>
-            <Card bg={cardBg} boxShadow="sm" borderRadius="lg">
-              <CardBody>
-                <Text fontSize="sm" color="gray.500">Categorías</Text>
-                <Heading size="lg">5</Heading>
-              </CardBody>
-            </Card>
-            <Card bg={cardBg} boxShadow="sm" borderRadius="lg">
-              <CardBody>
-                <Text fontSize="sm" color="gray.500">Recientes</Text>
-                <Heading size="lg">2</Heading>
-              </CardBody>
-            </Card>
-          </SimpleGrid>
-
-          {/* Listado de proveedores */}
           <Card bg={cardBg} boxShadow="md" borderRadius="xl" overflow="hidden">
             <CardHeader borderBottom="1px" borderColor={borderColor}>
               <Flex justify="space-between" align="center">
@@ -173,18 +176,14 @@ const SuppliersPage = () => {
             <CardBody p={0}>
               <SupplierList
                 suppliers={filteredSuppliers}
-                onEdit={(supplier) => {
-                  setSelectedSupplier(supplier);
-                  onOpen();
-                }}
-                onDelete={handleDeleteSupplier}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
               />
             </CardBody>
           </Card>
         </Box>
       </Box>
 
-      {/* Modal para formulario */}
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>
@@ -202,8 +201,7 @@ const SuppliersPage = () => {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <SupplierForm
-              onAddSupplier={handleAddSupplier}
-              onEditSupplier={handleEditSupplier}
+              onSave={handleSave}
               supplier={selectedSupplier}
             />
           </ModalBody>

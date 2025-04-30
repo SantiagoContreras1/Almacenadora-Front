@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getSuppliers as getSuppliersRequest } from "../../services/api";
+import { getSuppliers as getSuppliersRequest, saveSupplier as saveSupplierRequest, editSupplier as editSupplierRequest, deleteSupplier as deleteSupplierRequest} from "../../services/api";
 import { useToast } from "@chakra-ui/react";
 export const useSuppliers = () => {
   const toast = useToast();
@@ -26,9 +26,68 @@ export const useSuppliers = () => {
     return suppliers;
   };
 
+  const saveSupplier = async (data) => {
+    setIsLoading(true)
+    
+    const response = await saveSupplierRequest(data)
+
+    if (response.error) {
+      toast({
+        title: "Save Supplier Failed",
+        description:
+          response.error?.response?.data || "An error occurred during Save",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+      setIsLoading(false);
+      return;
+    }
+  }
+
+  const updateSupplier = async (id, data) => {
+    setIsLoading(true);
+
+    const response = await editSupplierRequest(id, data);
+
+    if (response.error) {
+      toast({
+        title: "Update product Failed",
+        description:
+          response.error?.response?.data || "An error occurred during Update",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+      setIsLoading(false);
+      return;
+    }
+  };
+
+  const deleteSupplier = async (id) => {
+    setIsLoading(true)
+
+    const response = await deleteSupplierRequest(id)
+    if (response.error) {
+      toast({
+        title: "Delete product Failed",
+        description:
+          response.error?.response?.data || "An error occurred during Delete",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+      setIsLoading(false);
+      return;
+    }
+  }
+
 
   return {
     getSuppliers,
+    saveSupplier,
+    deleteSupplier,
+    updateSupplier,
     isLoading,
   };
 };

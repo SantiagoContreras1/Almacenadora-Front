@@ -39,10 +39,12 @@ const lowStockProducts = productsData.filter((p) => p.stock < 10);
 
 const ReportsPage = () => {
   return (
-    <Flex>
+    <>
       <SideBar />
-      <Box flex="1" bg="gray.50" minH="100vh">
-        <TopBar />
+      <TopBar />
+      <Box ml="250px" p="5">
+        <Box mb="4" display="flex" justifyContent="space-between" gap={4} flexWrap="wrap">
+        
         <Container maxW="7xl" py={8}>
           <Heading
             mb={10}
@@ -81,8 +83,9 @@ const ReportsPage = () => {
             </Box>
           </ExpandableSection>
         </Container>
+        </Box>
       </Box>
-    </Flex>
+      </>
   );
 };
 

@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { ProductDetailModal } from "./ProductDetailModal";
-import { DeleteProductAlert } from "./DeleteProductAlert";
+import { GenericAlert } from "../GenericAlert";
 
 export const ProductCard = ({ product, onEdit, onDelete }) => {
   const {
@@ -79,12 +79,20 @@ export const ProductCard = ({ product, onEdit, onDelete }) => {
         onEdit={onEdit}
       />
 
-      <DeleteProductAlert
+      <GenericAlert
         isOpen={isDeleteAlertOpen}
         onClose={onDeleteAlertClose}
         cancelRef={cancelRef}
-        onDelete={handleDelete}
-        productName={product.name}
+        onConfirm={handleDelete}
+        title="Eliminar Producto"
+        description={
+          <>
+            ¿Está seguro que desea eliminar el producto{" "}
+            <strong>{product.name}</strong>? Esta acción no se puede deshacer.
+          </>
+        }
+        confirmButtonText="Eliminar"
+        confirmButtonColor="red"
       />
     </>
   );

@@ -117,6 +117,38 @@ export const getSuppliers = async () => {
   }
 }
 
+export const saveSupplier = async (data) => {
+  try {
+    return await apiClient.post('/proveedores/save', data)
+  } catch (e) {
+    return {
+      error: true,
+      e
+    }
+  }
+}
+
+export const editSupplier = async (id, data) => {
+  try {
+    return await apiClient.put(`/proveedores/update/${id}`, data);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const deleteSupplier = async (id) => {
+  try {
+    return await apiClient.delete(`/proveedores/delete/${id}`);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
 
 export const getCategories = async () => {
   try {

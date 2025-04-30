@@ -26,10 +26,10 @@ export const useProducts = () => {
     return products;
   };
 
-  const saveProduct = async (id, newProduct) => {
+  const saveProduct = async (newProduct) => {
     setIsLoading(true);
 
-    const response = await saveProductRequest(id, newProduct);
+    const response = await saveProductRequest( newProduct);
 
     if (response.error) {
       toast({
