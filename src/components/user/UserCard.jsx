@@ -5,16 +5,13 @@ import {
   CardBody,
   Heading,
   Text,
-  Box,
-  Button,
-  CardFooter,
   VStack,
   HStack,
   Badge,
   Avatar
 } from "@chakra-ui/react";
  
-export const UserCard = ({ users, onEdit, onMovement }) => {    
+export const UserCard = ({ users }) => {    
   const user = {
     name: "Usuario de Prueba",
     email: "prueba@ejemplo.com",
