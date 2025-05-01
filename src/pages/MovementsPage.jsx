@@ -36,7 +36,7 @@ const MovementsPage = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
 
   const addMovement = (data, type) => setHistory([...history, { ...data, type }]);
-  const deleteMovement = (index) => setHistory(history.filter((_, i) => i !== index));
+  
 
   const filteredMovements = history.filter(
     (movement) =>
@@ -74,13 +74,7 @@ const MovementsPage = () => {
               Nuevo Movimiento
             </Button>
 
-            <Button
-              leftIcon={<FaMinus />}
-              colorScheme="red"
-              onClick={onDeleteOpen}
-            >
-              Eliminar Movimiento
-            </Button>
+            
           </Flex>
 
           <Card mb={8} border="1px" borderColor={borderColor}>
