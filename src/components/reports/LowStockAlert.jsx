@@ -10,6 +10,22 @@ import {
     Icon
   } from "@chakra-ui/react";
   import { WarningIcon } from "@chakra-ui/icons";
+
+  const StockStatusBadge = ({ status }) => {
+    const colorScheme =
+      {
+        Urgente: "red",
+        Bajo: "orange",
+        Moderado: "green",
+        Alto: "blue",
+      }[status] || "gray";
+  
+    return (
+      <StatHelpText color={colorScheme} borderRadius="md" px="2" py="1">
+        {status}
+      </StatHelpText>
+    );
+  };
   
   const LowStockAlert = ({ products }) => {
     const bg = useColorModeValue("red.50", "red.900");
@@ -34,7 +50,7 @@ import {
                 <Icon as={WarningIcon} color={iconColor} mr={2} />{product.name}
               </StatLabel>
               <StatNumber color={color}>{product.stock} unidades</StatNumber>
-              <StatHelpText color={color} fontStyle="italic">Stock Crítico</StatHelpText>
+              <StockStatusBadge status={product.tipo}></StockStatusBadge>
             </Stat>
           </Box>
         ))}

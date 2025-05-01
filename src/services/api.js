@@ -106,6 +106,29 @@ export const deleteProduct = async (id) => {
   }
 };
 
+
+export const getBestSellers = async () => {
+  try {
+    return await apiClient.get('/products/bestSellers');
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+}
+
+export const getLowStockProducts = async () => {
+  try {
+    return await apiClient.get('/products/lowStock');
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+}
+
 export const getSuppliers = async () => {
   try {
     return await apiClient.get('/proveedores');
@@ -158,6 +181,28 @@ export const getCategories = async () => {
       error: true,
       e,
     };
+  }
+}
+
+export const getAllMovements = async () => {
+  try {
+    return await apiClient.get("/movements")
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    }
+  }
+}
+
+export const getWeeklyInventoryMovements = async () => {
+  try {
+    return await apiClient.get("/movements/weekly")
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    }
   }
 }
 

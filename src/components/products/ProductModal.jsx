@@ -66,6 +66,7 @@ export const ProductModal = ({
         }
       };
 
+      console.log(product)
       if (product) {
         reset({
           name: product.name || "",
@@ -73,7 +74,8 @@ export const ProductModal = ({
           image: product.image || "",
           stock: product.stock || 0,
           proveedor: product.proveedor?._id || "",
-          entryDate: formatDate(product.entrada),
+          entrada: formatDate(product.entrada),
+          vencimiento: formatDate(product.vencimiento),
           description: product.description || "",
           price: product.price || 0,
         });
@@ -84,7 +86,8 @@ export const ProductModal = ({
           image: "",
           stock: 0,
           proveedor: "",
-          entryDate: "",
+          entrada: "",
+          vencimiento: "",
           description: "",
           price: 0,
         });
@@ -204,7 +207,15 @@ export const ProductModal = ({
                 <FormLabel>Fecha de entrada</FormLabel>
                 <Input
                   type="date"
-                  {...register("entryDate", { required: true })}
+                  {...register("entrada", { required: true })}
+                />
+              </FormControl>
+
+              <FormControl mb="3" isInvalid={errors.expiration}>
+                <FormLabel>Fecha de Vencimiento</FormLabel>
+                <Input
+                  type="date"
+                  {...register("vencimiento", { required: true })}
                 />
               </FormControl>
 

@@ -8,7 +8,6 @@ export const AppRouter = () => {
   const SuppliersPage = lazy(() => import("../pages/SuppliersPage"));
   const ClientsPage = lazy(() => import("../pages/ClientsPage"));
   const MovementsPage = lazy(() => import("../pages/MovementsPage"));
-  const StatisticsPage = lazy(() => import("../pages/StatisticsPage"));
   const UsersPage = lazy(() => import("../pages/UsersPage"));
   const ReportsPage = lazy(() => import("../pages/ReportsPage"));
   const AuthPage = lazy(() => import("../pages/AuthPage"));
@@ -28,7 +27,6 @@ export const AppRouter = () => {
         <Route path="/clients" element={<ClientsPage />} />
         <Route path="/movements" element={<MovementsPage />} />
         <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/statistics" element={<StatisticsPage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/" element={<DashBoardPage />} />
       </Routes>

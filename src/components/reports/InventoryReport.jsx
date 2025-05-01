@@ -20,7 +20,7 @@ const InventoryReport = ({ products }) => {
         </Thead>
         <Tbody>
           {products.map((product) => (
-            <Tr key={product.id}>
+            <Tr key={product.uid}>
               <Td>{product.name}</Td>
               <Td>{product.stock}</Td>
               <Td>${product.price}</Td>

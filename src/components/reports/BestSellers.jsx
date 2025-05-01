@@ -15,8 +15,8 @@ const BestSellers = ({ data }) => {
         <Tbody>
           {data.map((item, index) => (
             <Tr key={index}>
-              <Td>{item.productName}</Td>
-              <Td>{item.totalSales}</Td>
+              <Td>{item.name}</Td>
+              <Td>{item.ventas}</Td>
               <Td>{item.stock}</Td>
             </Tr>
           ))}

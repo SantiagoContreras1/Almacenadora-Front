@@ -20,7 +20,6 @@ import { ProductsTable } from "./ProductsTable";
 import { SideBar } from "./SideBar";
 import { StatCard } from "./StatCard";
 import { TopBar } from "./TopBar";
-import AlertaPanel from "../AlertaPanel"
 
 const productData = [
   {
@@ -157,7 +156,6 @@ const AdminDashboard = () => {
      
       <Box ml="64" flex="1" p="6" overflow="auto">
         <TopBar />
-        <AlertaPanel/>
 
         <Grid
           templateColumns={{
@@ -239,7 +237,6 @@ const AdminDashboard = () => {
           </ChartContainer>
         </Box>
 
-        {/* Gráfico de Productos Más Vendidos - Ancho completo con altura explícita */}
         <Box width="100%" mb="6" height="400px">
           <ChartContainer title="Productos Más Vendidos">
             <ResponsiveContainer width="100%" height="100%">
