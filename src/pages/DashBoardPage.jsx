@@ -2,14 +2,14 @@ import { useDispatch, useSelector } from "react-redux";
 import AdminDashboard from "../components/dashboard/AdminDashboard";
 import EmployeeDashboard from "../components/dashboard/EmployeeDashBoard";
 import { Box } from "@chakra-ui/react";
-import { Home } from "./HomePage";
 import { useEffect } from "react";
 import { loadUserFromStorage } from "../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 
 const DashboardPage = () => {
   const { user } = useSelector((state) => state.auth);
-  
+  const navigate = useNavigate()
   const dispatch = useDispatch();
 
   useEffect(()=> {
@@ -17,7 +17,7 @@ const DashboardPage = () => {
   }, [dispatch])
 
   if (!user) {
-    return <Home/>
+    navigate("/auth")
   }
 
   return (

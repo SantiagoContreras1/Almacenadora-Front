@@ -11,7 +11,7 @@ export const AppRouter = () => {
   const UsersPage = lazy(() => import("../pages/UsersPage"));
   const ReportsPage = lazy(() => import("../pages/ReportsPage"));
   const AuthPage = lazy(() => import("../pages/AuthPage"));
-
+  const HomePage = lazy(()=> import("../pages/HomePage"))
   return (
     <Suspense
       fallback={
@@ -29,6 +29,7 @@ export const AppRouter = () => {
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/" element={<DashBoardPage />} />
+        <Route path="/home" element={<HomePage/>}/>
       </Routes>
     </Suspense>
   );

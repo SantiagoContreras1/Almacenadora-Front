@@ -69,10 +69,6 @@ export const Register = ({ toggleAuthMode }) => {
                   placeholder="Username"
                   {...register("username", {
                     required: "Username is required",
-                    minLength: {
-                      value: 8,
-                      message: "The username must have at least 8 characters.",
-                    },
                   })}
                 />
                 <FormErrorMessage>

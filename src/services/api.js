@@ -206,6 +206,39 @@ export const getWeeklyInventoryMovements = async () => {
   }
 }
 
+export const getUsers = async () => {
+  try {
+    return await apiClient.get("/users")
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    }
+  }
+}
+
+export const editUser = async (id, data) => {
+  try {
+    return await apiClient.put(`/users/${id}`, data);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const deleteUser = async (id) => {
+  try {
+    return await apiClient.delete(`/users/${id}`);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
 export const checkEmail = async (email) => {
   try {
     const response = await apiClient.get("/users/checkEmail", {

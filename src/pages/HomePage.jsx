@@ -1,7 +1,7 @@
 import { Box, Heading, Text, Button, VStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
-export const Home = () => {
+const Home = () => {
   const navigate = useNavigate();
 
   return (
@@ -29,3 +29,5 @@ export const Home = () => {
     </Box>
   );
 };
+
+export default Home
