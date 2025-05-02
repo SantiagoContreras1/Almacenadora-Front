@@ -239,6 +239,50 @@ export const deleteUser = async (id) => {
   }
 };
 
+
+export const getClients = async () => {
+  try {
+    return await apiClient.get('/clients');
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+}
+
+export const saveClient = async (data) => {
+  try {
+    return await apiClient.post('/clients/save', data)
+  } catch (e) {
+    return {
+      error: true,
+      e
+    }
+  }
+}
+
+export const editClient = async (id, data) => {
+  try {
+    return await apiClient.put(`/clients/update/${id}`, data);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const deleteClient = async (id) => {
+  try {
+    return await apiClient.delete(`/clients/delete/${id}`);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
 export const checkEmail = async (email) => {
   try {
     const response = await apiClient.get("/users/checkEmail", {
