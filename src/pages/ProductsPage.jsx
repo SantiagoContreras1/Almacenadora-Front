@@ -137,7 +137,7 @@ const ProductsPage = () => {
           </Button>
         </Box>
 
-        <SimpleGrid columns={[1, 2, 3]} spacing={5}>
+        <SimpleGrid columns={[1, 2, 3,4]} spacing={5}>
           {products.map((product) => (
             <ProductCard
               key={product.uid}

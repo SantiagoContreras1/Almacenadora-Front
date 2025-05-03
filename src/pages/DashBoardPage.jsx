@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import AdminDashboard from "../components/dashboard/AdminDashboard";
-import EmployeeDashboard from "../components/dashboard/EmployeeDashBoard";
+import EmployeeDashboard from "../components/dashboard/EmployeeDashboard";
 import { Box } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { loadUserFromStorage } from "../features/auth/authSlice";
@@ -21,7 +21,7 @@ const DashboardPage = () => {
   }
 
   return (
-    <Box p={4}>
+    <Box>
       {user.role === "ADMIN_ROLE" ? <AdminDashboard /> : <EmployeeDashboard />}
     </Box>
   );

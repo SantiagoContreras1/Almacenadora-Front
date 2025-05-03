@@ -1,48 +1,147 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Button,
+  Card,
+  CardBody,
+  Flex,
+  Heading,
+  HStack,
+  Input,
+  InputGroup,
+  InputRightElement,
+  IconButton,
+  Text,
+  SimpleGrid,
+  useDisclosure,
+  useColorModeValue,
+  Select,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  Spinner,
+} from "@chakra-ui/react";
+import { FaPlus, FaSearch, FaMinus } from "react-icons/fa";
 import { SideBar } from "../components/dashboard/SideBar";
 import { TopBar } from "../components/dashboard/TopBar";
-import AddMovements from "../components/movements/Addmovements";
-import DeleteMovements from "../components/movements/Deletemovements";
+import MovementForm from "../components/movements/MovementForm";
 import Listmovements from "../components/movements/Listmovements";
-import Modal from "react-modal";
-import { Box, Button, Card, CardBody, Flex, Heading, HStack, Input, InputGroup, InputRightElement, IconButton, Icon, SimpleGrid, useDisclosure, useColorModeValue, Text } from "@chakra-ui/react";
-import { FaPlus, FaSearch, FaTrashAlt, FaRegEdit, FaMinus } from "react-icons/fa";
-
-Modal.setAppElement('#root');
-
-const modalStyle = {
-  overlay: {
-    backgroundColor: "rgba(0, 0, 0, 0.75)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  content: {
-    position: "relative",
-    inset: "unset",
-    padding: 0,
-    border: "none",
-    background: "none",
-    overflow: "visible",
-  },
-};
+import { useMovements } from "../shared/hooks/useMovements";
+import { useProducts } from "../shared/hooks/useProducts";
 
 const MovementsPage = () => {
-  const [history, setHistory] = useState([]);
+  const [movements, setMovements] = useState([]);
+  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [defaultType, setDefaultType] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
   const [selectedMovement, setSelectedMovement] = useState(null);
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  
+  const { 
+    getMovements, 
+    saveInput,
+    saveOutput, 
+    editInput,
+    editOutput,
+    deleteInput,
+    deleteOutput,
+    isLoading: isMovementsLoading 
+  } = useMovements();
+  
+  const { 
+    getProducts, 
+  } = useProducts();
 
-  const addMovement = (data, type) => setHistory([...history, { ...data, type }]);
+  useEffect(() => {
+    fetchMovements();
+    fetchProducts();
+  }, []);
+
+  const fetchMovements = async () => {
+    const data = await getMovements();
+    if (data) {
+      setMovements(data);
+    }
+  };
+
+  const fetchProducts = async () => {
+    const data = await getProducts();
+    if (data) {
+      setProducts(data);
+    }
+  };
+
+  const handleSaveMovement = async (movementData, type) => {
+    let result;
+    let dataformated;
+    if (selectedMovement) {
+      if (selectedMovement.type === "Entrada") {
+        result = await editInput(selectedMovement.id, movementData);
+      } else {
+        dataformated  = {
+          quantityRemoved: movementData.quantity,
+          reason: movementData.reason,
+          destination: movementData.destination
+        }
+        result = await editOutput(selectedMovement.id, dataformated);
+      }
+    } else {
+      if (type === "Entrada") {
+        console.log(movementData)
+        result = await saveInput(movementData);
+      } else {
+        console.log(movementData)
+        result = await saveOutput(movementData);
+      }
+    }
+    
+    if (result) {
+      onClose();
+      fetchMovements();
+    }
+  };
+
+  const handleEdit = (movement) => {
+    setSelectedMovement(movement);
+    onOpen();
+  };
+
+  const handleDelete = async (id, type) => {
+    let success;
+    if (type === "Entrada") {
+      success = await deleteInput(id);
+    } else {
+      success = await deleteOutput(id);
+    }
+    if (success) {
+      fetchMovements();
+    }
+  };
+
+  const handleOpenCreate = (type) => {
+    setSelectedMovement(null);
+    setDefaultType(type);
+    onOpen();
+  };
   
 
-  const filteredMovements = history.filter(
-    (movement) =>
-      movement.name?.toLowerCase().includes(search.toLowerCase()) ||
-      movement.type?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredMovements = movements.filter((movement) => {
+    const movementDate = new Date(movement.date);
+    const isAfterStart = startDate ? movementDate >= new Date(startDate) : true;
+    const isBeforeEnd = endDate ? movementDate <= new Date(endDate) : true;
+    const matchesSearch =
+      movement.productName?.toLowerCase().includes(search.toLowerCase()) ||
+      String(movement.id).includes(search.toLowerCase());
+    const matchesType = typeFilter ? movement.type === typeFilter : true;
+
+    return isAfterStart && isBeforeEnd && matchesSearch && matchesType;
+  });
 
   const bg = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
@@ -56,33 +155,44 @@ const MovementsPage = () => {
         <TopBar />
 
         <Box p={{ base: 4, md: 8 }}>
-          <Flex justify="space-between" align="center" mb={8}>
+          <Flex justify="space-between" mb={8} flexWrap="wrap" gap={4}>
             <HStack spacing={4}>
               <Heading size="xl" color={titleColor}>
                 🔄 Movimientos
               </Heading>
             </HStack>
 
-            <Button
-              leftIcon={<FaPlus />}
-              colorScheme="teal"
-              onClick={() => {
-                setSelectedMovement(null);
-                setIsAddOpen(true);
-              }}
-            >
-              Nuevo Movimiento
-            </Button>
-
-            
+            <HStack spacing={4}>
+              <Button
+                leftIcon={<FaPlus />}
+                colorScheme="teal"
+                onClick={() => handleOpenCreate("Entrada")}
+                isLoading={isMovementsLoading}
+              >
+                Nueva Entrada
+              </Button>
+              <Button
+                leftIcon={<FaMinus />}
+                colorScheme="red"
+                onClick={() => handleOpenCreate("Salida")}
+                isLoading={isMovementsLoading}
+              >
+                Nueva Salida
+              </Button>
+            </HStack>
           </Flex>
 
           <Card mb={8} border="1px" borderColor={borderColor}>
             <CardBody>
-              <Flex direction={{ base: "column", md: "row" }} gap={4}>
-                <InputGroup flex="1">
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                gap={4}
+                align="center"
+                flexWrap="wrap"
+              >
+                <InputGroup flex="1" maxW="300px">
                   <Input
-                    placeholder="Buscar por nombre o tipo..."
+                    placeholder="Buscar por nombre o ID..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     borderRadius="lg"
@@ -96,6 +206,48 @@ const MovementsPage = () => {
                     />
                   </InputRightElement>
                 </InputGroup>
+
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  placeholder="Fecha inicio"
+                  maxW="200px"
+                />
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  placeholder="Fecha fin"
+                  maxW="200px"
+                />
+
+                <Select
+                  placeholder="Filtrar por tipo"
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  maxW="200px"
+                >
+                  <option value="Entrada">Entrada</option>
+                  <option value="Salida">Salida</option>
+                </Select>
+
+                {(startDate || endDate || search || typeFilter) && (
+                  <Button
+                    onClick={() => {
+                      setStartDate("");
+                      setEndDate("");
+                      setSearch("");
+                      setTypeFilter("");
+                    }}
+                    colorScheme="gray"
+                    variant="outline"
+                    borderRadius="lg"
+                    maxW="160px"
+                  >
+                    Limpiar filtros
+                  </Button>
+                )}
               </Flex>
             </CardBody>
           </Card>
@@ -103,45 +255,67 @@ const MovementsPage = () => {
           <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} gap={6} mb={8}>
             <Card bg={cardBg} boxShadow="sm" borderRadius="lg">
               <CardBody>
-                <Text fontSize="sm" color="gray.500">Entradas</Text>
-                <Heading size="lg">{history.filter(m => m.type === "Entrada").length}</Heading>
+                <Text fontSize="sm" color="gray.500">
+                  Entradas
+                </Text>
+                <Heading size="lg">
+                  {movements.filter((m) => m.type === "Entrada").length}
+                </Heading>
               </CardBody>
             </Card>
             <Card bg={cardBg} boxShadow="sm" borderRadius="lg">
               <CardBody>
-                <Text fontSize="sm" color="gray.500">Salidas</Text>
-                <Heading size="lg">{history.filter(m => m.type === "Salida").length}</Heading>
+                <Text fontSize="sm" color="gray.500">
+                  Salidas
+                </Text>
+                <Heading size="lg">
+                  {movements.filter((m) => m.type === "Salida").length}
+                </Heading>
               </CardBody>
             </Card>
             <Card bg={cardBg} boxShadow="sm" borderRadius="lg">
               <CardBody>
-                <Text fontSize="sm" color="gray.500">Total Movimientos</Text>
-                <Heading size="lg">{history.length}</Heading>
+                <Text fontSize="sm" color="gray.500">
+                  Total Movimientos
+                </Text>
+                <Heading size="lg">{movements.length}</Heading>
               </CardBody>
             </Card>
           </SimpleGrid>
 
           <Box mt={8}>
-            <Listmovements suppliers={filteredMovements} />
+            {isMovementsLoading ? (
+              <Flex justify="center" align="center" height="200px">
+                <Spinner size="xl" color="teal.500" />
+              </Flex>
+            ) : (
+              <Listmovements
+                movements={filteredMovements}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            )}
           </Box>
-
         </Box>
       </Box>
 
-      <Modal isOpen={isAddOpen} onRequestClose={() => setIsAddOpen(false)} style={modalStyle}>
-        <div style={{ background: "#fff", borderRadius: "10px", padding: "20px", maxWidth: "500px", boxShadow: "0 5px 15px rgba(0,0,0,0.3)" }}>
-          <AddMovements
-            addEntry={(data) => addMovement(data, "Entrada")}
-            addExit={(data) => addMovement(data, "Salida")}
-            movement={selectedMovement}
-          />
-        </div>
-      </Modal>
-
-      <Modal isOpen={isDeleteOpen} onRequestClose={onDeleteClose} style={modalStyle}>
-        <div style={{ background: "#fff", borderRadius: "10px", padding: "20px", maxWidth: "500px", boxShadow: "0 5px 15px rgba(0,0,0,0.3)" }}>
-          <DeleteMovements />
-        </div>
+      
+      <Modal isOpen={isOpen} onClose={onClose} size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            {selectedMovement ? "Editar Movimiento" : "Nuevo Movimiento"}
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <MovementForm
+              movement={selectedMovement}
+              onSave={handleSaveMovement}
+              products={products}
+              defaultType={selectedMovement ? selectedMovement.type : defaultType}
+            />
+          </ModalBody>
+        </ModalContent>
       </Modal>
     </Box>
   );

@@ -283,6 +283,85 @@ export const deleteClient = async (id) => {
     };
   }
 };
+
+
+export const getMovements = async () => {
+  try {
+    return await apiClient.get('/movements');
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+}
+
+export const saveInput = async (data) => {
+  try {
+    return await apiClient.post('/input/save', data)
+  } catch (e) {
+    return {
+      error: true,
+      e
+    }
+  }
+}
+
+export const editInput = async (id, data) => {
+  try {
+    return await apiClient.put(`/input/update/${id}`, data);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const deleteInput = async (id) => {
+  try {
+    return await apiClient.delete(`/input/delete/${id}`);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const saveOutput = async (data) => {
+  try {
+    return await apiClient.post('/output/save', data)
+  } catch (e) {
+    return {
+      error: true,
+      e
+    }
+  }
+}
+
+export const editOutput = async (id, data) => {
+  try {
+    return await apiClient.put(`/output/update/${id}`, data);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const deleteOutput = async (id) => {
+  try {
+    return await apiClient.delete(`/output/delete/${id}`);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
 export const checkEmail = async (email) => {
   try {
     const response = await apiClient.get("/users/checkEmail", {
