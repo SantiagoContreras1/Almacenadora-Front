@@ -6,32 +6,39 @@ import {
   Button,
   VStack,
   useDisclosure,
-  Text,
   Box,
   List,
-  ListItem
+  ListItem,
+  InputGroup,
+  InputRightElement,
+  IconButton,
+  FormErrorMessage,
+  Text,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { GenericAlert } from "../GenericAlert";
+import { CloseIcon } from "@chakra-ui/icons";
 
 const MovementForm = ({ onSave, movement, products, defaultType }) => {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     getValues,
     setValue,
+    watch,
   } = useForm({
     defaultValues: {
       productName: "",
-      product: "", 
+      product: "",
       quantity: "",
       reason: "",
       destination: "",
       date: Date.now,
       type: defaultType,
     },
+    mode: "onBlur", // Validate on blur for better user experience
   });
 
   const [productSearch, setProductSearch] = useState("");
@@ -43,6 +50,9 @@ const MovementForm = ({ onSave, movement, products, defaultType }) => {
     onOpen: onConfirmAlertOpen,
     onClose: onConfirmAlertClose,
   } = useDisclosure();
+
+  // Watch the type field to update validations accordingly
+  const type = watch("type") || defaultType;
 
   useEffect(() => {
     if (movement) {
@@ -57,49 +67,69 @@ const MovementForm = ({ onSave, movement, products, defaultType }) => {
     p.name.toLowerCase().includes(productSearch.toLowerCase())
   );
 
-  const confirmEdit = () => {
-    const data = getValues();
-    onSave(data, data.type);
+  const confirmEdit = (data) => {
     onConfirmAlertClose();
+    onSave(data, data.type);
   };
 
   const onSubmit = (data) => {
     onSave(data, data.type);
   };
 
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
+  const handleFormSubmit = (data) => {
     if (movement) {
       onConfirmAlertOpen();
     } else {
-      handleSubmit(onSubmit)();
+      onSubmit(data);
     }
   };
 
-  const type = getValues("type") || defaultType;
-
   return (
     <>
-      <form onSubmit={handleFormSubmit}>
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
         <VStack spacing={4} align="stretch">
-          <FormControl isInvalid={errors.productName} position="relative">
-            <FormLabel>Producto</FormLabel>
-            <Input
-              placeholder="Buscar producto"
-              value={productSearch}
-              onChange={(e) => {
-                setProductSearch(e.target.value);
-                setShowSuggestions(true);
-                setValue("productName", e.target.value);
-              }}
-              onFocus={() => setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              {...register("productName")} 
+          <FormControl isInvalid={!!errors.product || !!errors.productName} position="relative">
+            <FormLabel>Producto <Text as="span" color="red.500">*</Text></FormLabel>
+            <InputGroup>
+              <Input
+                placeholder="Buscar producto"
+                value={productSearch}
+                onChange={(e) => {
+                  setProductSearch(e.target.value);
+                  setShowSuggestions(true);
+                  setValue("productName", e.target.value);
+                  setValue("product", "");
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                {...register("productName", { 
+                  required: "Nombre del producto es requerido"
+                })}
+              />
+              {productSearch && (
+                <InputRightElement>
+                  <IconButton
+                    aria-label="Limpiar selección"
+                    icon={<CloseIcon />}
+                    size="sm"
+                    onClick={() => {
+                      setProductSearch("");
+                      setValue("productName", "");
+                      setValue("product", "");
+                    }}
+                  />
+                </InputRightElement>
+              )}
+            </InputGroup>
+
+            <Input 
+              type="hidden" 
+              {...register("product", { 
+                required: "Debe seleccionar un producto válido de la lista"
+              })} 
             />
-           
-            <Input type="hidden" {...register("product")} />
-            
-            {showSuggestions && filteredProducts.length > 0 && (
+
+            {showSuggestions && filteredProducts?.length > 0 && (
               <Box
                 position="absolute"
                 zIndex={10}
@@ -120,8 +150,8 @@ const MovementForm = ({ onSave, movement, products, defaultType }) => {
                       _hover={{ bg: "gray.100", cursor: "pointer" }}
                       onClick={() => {
                         setProductSearch(product.name);
-                        setValue("productName", product.name);
-                        setValue("product", product.uid);
+                        setValue("productName", product.name, { shouldValidate: true });
+                        setValue("product", product.uid, { shouldValidate: true });
                         setShowSuggestions(false);
                       }}
                     >
@@ -131,41 +161,65 @@ const MovementForm = ({ onSave, movement, products, defaultType }) => {
                 </List>
               </Box>
             )}
+
+            {!showSuggestions && productSearch && !getValues("product") && (
+              <FormErrorMessage>Por favor seleccione un producto de la lista</FormErrorMessage>
+            )}
+            {errors.product && <FormErrorMessage>{errors.product.message}</FormErrorMessage>}
+            {errors.productName && <FormErrorMessage>{errors.productName.message}</FormErrorMessage>}
           </FormControl>
 
-          <FormControl isInvalid={errors.quantity}>
+          <FormControl isInvalid={!!errors.quantity}>
             <FormLabel>
-              {type === "Salida" ? "Cantidad Removida" : "Cantidad Añadida"}
+              {type === "Salida" ? "Cantidad Removida" : "Cantidad Añadida"} <Text as="span" color="red.500">*</Text>
             </FormLabel>
             <Input
               type="number"
-              {...register("quantity", { required: "Este campo es requerido" })}
+              {...register("quantity", { 
+                required: "La cantidad es requerida",
+                validate: {
+                  positive: value => parseFloat(value) > 0 || "La cantidad debe ser mayor que cero",
+                  number: value => !isNaN(parseFloat(value)) || "Ingrese un número válido"
+                }
+              })}
             />
+            {errors.quantity && <FormErrorMessage>{errors.quantity.message}</FormErrorMessage>}
           </FormControl>
 
           {type === "Salida" && (
             <>
-              <FormControl isInvalid={errors.reason}>
-                <FormLabel>Razón</FormLabel>
+              <FormControl isInvalid={!!errors.reason}>
+                <FormLabel>Razón <Text as="span" color="red.500">*</Text></FormLabel>
                 <Input
                   placeholder="Motivo de salida"
-                  {...register("reason", { required: "Este campo es requerido" })}
+                  {...register("reason", { 
+                    required: "La razón de salida es requerida",
+                    minLength: { value: 3, message: "La razón debe tener al menos 3 caracteres" }
+                  })}
                 />
+                {errors.reason && <FormErrorMessage>{errors.reason.message}</FormErrorMessage>}
               </FormControl>
 
-              <FormControl isInvalid={errors.destination}>
-                <FormLabel>Destino</FormLabel>
+              <FormControl isInvalid={!!errors.destination}>
+                <FormLabel>Destino <Text as="span" color="red.500">*</Text></FormLabel>
                 <Input
                   placeholder="Destino del producto"
                   {...register("destination", {
-                    required: "Este campo es requerido",
+                    required: "El destino es requerido",
+                    minLength: { value: 3, message: "El destino debe tener al menos 3 caracteres" }
                   })}
                 />
+                {errors.destination && <FormErrorMessage>{errors.destination.message}</FormErrorMessage>}
               </FormControl>
             </>
           )}
 
-          <Button colorScheme="teal" type="submit">
+          <Button 
+            colorScheme="teal" 
+            type="submit" 
+            isLoading={isSubmitting}
+            disabled={isSubmitting}
+          >
             {movement ? "Actualizar" : "Guardar"}
           </Button>
         </VStack>
@@ -175,7 +229,7 @@ const MovementForm = ({ onSave, movement, products, defaultType }) => {
         isOpen={isConfirmAlertOpen}
         onClose={onConfirmAlertClose}
         cancelRef={cancelRef}
-        onConfirm={confirmEdit}
+        onConfirm={() => handleSubmit(confirmEdit)()}
         title="Confirmar Cambios"
         description={
           <>

@@ -27,6 +27,8 @@ import {
   FiUser,
   FiMenu,
 } from "react-icons/fi";
+import { BiCategoryAlt } from "react-icons/bi";
+
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -69,17 +71,20 @@ export const SideBar = () => {
     navItems = [
       { name: "Dashboard", icon: FiHome, route: "" },
       { name: "Inventario", icon: FiBox, route: "products" },
+      { name: "Categorias", icon: BiCategoryAlt, route: "categories" },
       { name: "Movimientos", icon: FiRepeat, route: "movements" },
       { name: "Proveedores", icon: FiBriefcase, route: "suppliers" },
       { name: "Clientes", icon: FiUsers, route: "clients" },
       { name: "Informes", icon: FiPieChart, route: "reports" },
       { name: "Usuarios", icon: FiUser, route: "users" },
+      
     ];
   } else {
     navItems = [
       { name: "Dashboard", icon: FiHome, route: "" },
       { name: "Inventario", icon: FiBox, route: "products" },
       { name: "Movimientos", icon: FiRepeat, route: "movements" },
+      { name: "Categorias", icon: BiCategoryAlt, route: "categories" },
       { name: "Proveedores", icon: FiBriefcase, route: "suppliers" },
       { name: "Clientes", icon: FiUsers, route: "clients" },
     ];
@@ -95,7 +100,7 @@ export const SideBar = () => {
       px="4"
       py="5"
     >
-      <Link to="/dashboard" style={{ textDecoration: "none" }}>
+      <Link to="" style={{ textDecoration: "none" }}>
         <Flex align="center" mb="8" px="2">
           <Box bg="blue.500" borderRadius="md" p="2" mr="3" color="white">
             <Icon as={FiBox} boxSize="6" />

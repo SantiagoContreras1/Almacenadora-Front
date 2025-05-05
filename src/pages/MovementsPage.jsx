@@ -31,9 +31,11 @@ import MovementForm from "../components/movements/MovementForm";
 import Listmovements from "../components/movements/Listmovements";
 import { useMovements } from "../shared/hooks/useMovements";
 import { useProducts } from "../shared/hooks/useProducts";
+import { useNotifications } from "../shared/hooks/useNotifications";
 
 const MovementsPage = () => {
   const [movements, setMovements] = useState([]);
+  const [totalMovements, setTotalMovements] = useState(0);
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -41,32 +43,41 @@ const MovementsPage = () => {
   const [defaultType, setDefaultType] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [selectedMovement, setSelectedMovement] = useState(null);
+  const [inputs, setInputs] = useState()
+  const [outputs, setOutputs] = useState()
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const offset = (page - 1) * limit;
+
   const { isOpen, onOpen, onClose } = useDisclosure();
-  
-  const { 
-    getMovements, 
+
+  const {
+    getMovements,
     saveInput,
-    saveOutput, 
+    saveOutput,
     editInput,
     editOutput,
     deleteInput,
     deleteOutput,
-    isLoading: isMovementsLoading 
+    isLoading: isMovementsLoading,
   } = useMovements();
-  
-  const { 
-    getProducts, 
-  } = useProducts();
+
+  const { getProducts } = useProducts();
+
+  useNotifications();
 
   useEffect(() => {
     fetchMovements();
     fetchProducts();
-  }, []);
+  }, [page]);
 
   const fetchMovements = async () => {
-    const data = await getMovements();
+    const data = await getMovements( limit, offset );
     if (data) {
-      setMovements(data);
+      setMovements(data.movements || []);
+      setInputs(data.inputs)
+      setOutputs(data.outputs)
+      setTotalMovements(data.total || 0);
     }
   };
 
@@ -84,23 +95,21 @@ const MovementsPage = () => {
       if (selectedMovement.type === "Entrada") {
         result = await editInput(selectedMovement.id, movementData);
       } else {
-        dataformated  = {
+        dataformated = {
           quantityRemoved: movementData.quantity,
           reason: movementData.reason,
-          destination: movementData.destination
-        }
+          destination: movementData.destination,
+        };
         result = await editOutput(selectedMovement.id, dataformated);
       }
     } else {
       if (type === "Entrada") {
-        console.log(movementData)
         result = await saveInput(movementData);
       } else {
-        console.log(movementData)
         result = await saveOutput(movementData);
       }
     }
-    
+
     if (result) {
       onClose();
       fetchMovements();
@@ -129,7 +138,6 @@ const MovementsPage = () => {
     setDefaultType(type);
     onOpen();
   };
-  
 
   const filteredMovements = movements.filter((movement) => {
     const movementDate = new Date(movement.date);
@@ -142,6 +150,8 @@ const MovementsPage = () => {
 
     return isAfterStart && isBeforeEnd && matchesSearch && matchesType;
   });
+
+  const totalPages = Math.ceil(totalMovements / limit);
 
   const bg = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
@@ -211,14 +221,12 @@ const MovementsPage = () => {
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  placeholder="Fecha inicio"
                   maxW="200px"
                 />
                 <Input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  placeholder="Fecha fin"
                   maxW="200px"
                 />
 
@@ -259,7 +267,7 @@ const MovementsPage = () => {
                   Entradas
                 </Text>
                 <Heading size="lg">
-                  {movements.filter((m) => m.type === "Entrada").length}
+                  {inputs}
                 </Heading>
               </CardBody>
             </Card>
@@ -269,7 +277,7 @@ const MovementsPage = () => {
                   Salidas
                 </Text>
                 <Heading size="lg">
-                  {movements.filter((m) => m.type === "Salida").length}
+                  {outputs}
                 </Heading>
               </CardBody>
             </Card>
@@ -278,7 +286,7 @@ const MovementsPage = () => {
                 <Text fontSize="sm" color="gray.500">
                   Total Movimientos
                 </Text>
-                <Heading size="lg">{movements.length}</Heading>
+                <Heading size="lg">{totalMovements}</Heading>
               </CardBody>
             </Card>
           </SimpleGrid>
@@ -289,17 +297,39 @@ const MovementsPage = () => {
                 <Spinner size="xl" color="teal.500" />
               </Flex>
             ) : (
-              <Listmovements
-                movements={filteredMovements}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
+              <>
+                <Listmovements
+                  movements={filteredMovements}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+                <Flex justify="center" mt={6} gap={4}>
+                  <Button
+                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                    isDisabled={page === 1}
+                  >
+                    Anterior
+                  </Button>
+                  <Text alignSelf="center">
+                    Página {page} de {totalPages}
+                  </Text>
+                  <Button
+                    onClick={() =>
+                      setPage((prev) =>
+                        prev < totalPages ? prev + 1 : prev
+                      )
+                    }
+                    isDisabled={page >= totalPages}
+                  >
+                    Siguiente
+                  </Button>
+                </Flex>
+              </>
             )}
           </Box>
         </Box>
       </Box>
 
-      
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>

@@ -14,11 +14,11 @@ export const useMovements = () => {
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const getMovements = async () => {
+  const getMovements = async (limit, offset) => {
     setIsLoading(true);
     
     try {
-      const response = await getMovementsRequest();
+      const response = await getMovementsRequest(limit, offset);
       
       setIsLoading(false);
       
@@ -33,7 +33,7 @@ export const useMovements = () => {
         return [];
       }
       
-      return response.data.movements || [];
+      return response.data;
     } catch (error) {
       setIsLoading(false);
       toast({

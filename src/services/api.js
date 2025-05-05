@@ -1,4 +1,6 @@
 import axios from "axios";
+import { store } from "../app/store";
+import { logout } from "../features/auth/authSlice";
 
 const apiClient = axios.create({
   baseURL: "http://127.0.0.1:3000/almacenadora",
@@ -46,6 +48,9 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => {
+    if (error.response && error.response.status === 401) {
+      store.dispatch(logout())
+    }
     return Promise.reject(error);
   }
 );
@@ -106,6 +111,28 @@ export const deleteProduct = async (id) => {
   }
 };
 
+export const totalStock = async () => {
+  try {
+    return await apiClient.get(`/products/totalStock`);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+
+export const changePassword = async (id, data) => {
+  try {
+    return await apiClient.patch(`/users/password/${id}`, data);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
 
 export const getBestSellers = async () => {
   try {
@@ -184,16 +211,7 @@ export const getCategories = async () => {
   }
 }
 
-export const getAllMovements = async () => {
-  try {
-    return await apiClient.get("/movements")
-  } catch (e) {
-    return {
-      error: true,
-      e,
-    }
-  }
-}
+
 
 export const getWeeklyInventoryMovements = async () => {
   try {
@@ -284,10 +302,63 @@ export const deleteClient = async (id) => {
   }
 };
 
-
-export const getMovements = async () => {
+export const saveCategory = async (data) => {
   try {
-    return await apiClient.get('/movements');
+    return await apiClient.post('/categories/save', data)
+  } catch (e) {
+    return {
+      error: true,
+      e
+    }
+  }
+}
+
+export const editCategory = async (id, data) => {
+  try {
+    return await apiClient.put(`/categories/update/${id}`, data);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const deleteCategory = async (id) => {
+  try {
+    return await apiClient.delete(`/categories/delete/${id}`);
+  } catch (e) {
+    return {
+      error: true,
+      e,
+    };
+  }
+};
+
+export const getNotifications = async (limit, offset) => {
+  try {
+    return await apiClient.get("/notifications", {
+      params: {
+        limit,
+        offset
+      }
+    });
+    
+  } catch (e) {
+    return {
+      error: true,
+      e
+    }
+  }
+}
+export const getMovements = async (limit, offset) => {
+  try {
+    return await apiClient.get('/movements', {
+      params: {
+        limit,
+        offset
+      }
+    });
   } catch (e) {
     return {
       error: true,

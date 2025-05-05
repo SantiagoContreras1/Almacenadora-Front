@@ -8,17 +8,20 @@ import {
 } from "@chakra-ui/react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { GenericAlert } from "../GenericAlert";
 
 const SupplierList = ({ suppliers, onEdit, onDelete }) => {
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const cancelRef = useRef();
-  
+
   const {
     isOpen: isDeleteAlertOpen,
     onOpen: onDeleteAlertOpen,
     onClose: onDeleteAlertClose,
   } = useDisclosure();
+
+  const isAdmin = useSelector((state) => state.auth.isAdmin);
 
   const handleDeleteClick = (supplier) => {
     setSelectedSupplier(supplier);
@@ -50,21 +53,23 @@ const SupplierList = ({ suppliers, onEdit, onDelete }) => {
                   Direccion: {supplier.direccion}
                 </Text>
               </Box>
-              <Box>
-                <IconButton
-                  aria-label="Editar"
-                  icon={<FaEdit />}
-                  colorScheme="blue"
-                  mr={2}
-                  onClick={() => onEdit(supplier)}
-                />
-                <IconButton
-                  aria-label="Eliminar"
-                  icon={<FaTrash />}
-                  colorScheme="red"
-                  onClick={() => handleDeleteClick(supplier)}
-                />
-              </Box>
+              {isAdmin && (
+                <Box>
+                  <IconButton
+                    aria-label="Editar"
+                    icon={<FaEdit />}
+                    colorScheme="blue"
+                    mr={2}
+                    onClick={() => onEdit(supplier)}
+                  />
+                  <IconButton
+                    aria-label="Eliminar"
+                    icon={<FaTrash />}
+                    colorScheme="red"
+                    onClick={() => handleDeleteClick(supplier)}
+                  />
+                </Box>
+              )}
             </Flex>
           </Box>
         ))}

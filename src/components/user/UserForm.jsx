@@ -20,12 +20,14 @@ const UserForm = ({ user, onSave }) => {
     formState: { errors },
     getValues
   } = useForm({
+    mode: "onChange",
     defaultValues: {
       name: "",
       email: "",
       role: "USER_ROLE"
     }
   });
+  
 
   const cancelRef = useRef();
   const {

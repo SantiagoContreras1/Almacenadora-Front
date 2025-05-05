@@ -22,12 +22,18 @@ const AlertIcon = ({ type }) => {
       info: "blue.500",
     }[type] || "gray.500";
 
-  const icon =
-    {
-      warning: "⏱️",
-      danger: "⚠️",
-      info: "📦",
-    }[type] || "ℹ️";
+
+  let iconEmoji;
+  switch(type) {
+    case 'warning':
+      iconEmoji = "⏱️";
+      break;
+    case 'danger':
+      iconEmoji = "⚠️";
+      break;
+    default:
+      iconEmoji = "ℹ️";
+  }
 
   return (
     <Center
@@ -38,7 +44,7 @@ const AlertIcon = ({ type }) => {
       color={textColor}
       fontSize="lg"
     >
-      {icon}
+      {iconEmoji}
     </Center>
   );
 };

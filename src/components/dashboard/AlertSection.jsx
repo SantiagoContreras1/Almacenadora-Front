@@ -8,8 +8,9 @@ import {
 } from "@chakra-ui/react";
 import { FiEye } from "react-icons/fi";
 import { AlertItem } from "./AlertItem";
+import { Link } from "react-router-dom";
 
-export const AlertSection = ({ alerts }) => {
+export const AlertSection = ({ alerts, all=true }) => {
   return (
     <Box
       bg={useColorModeValue("white", "gray.700")}
@@ -22,14 +23,19 @@ export const AlertSection = ({ alerts }) => {
         <Text fontSize="lg" fontWeight="semibold">
           Alertas y Notificaciones
         </Text>
-        <Button
-          variant="link"
-          size="sm"
-          colorScheme="blue"
-          rightIcon={<FiEye />}
-        >
-          Ver todas
-        </Button>
+        {all && (
+            <Link to="/notifications">
+            <Button
+              variant="link"
+              size="sm"
+              colorScheme="blue"
+              rightIcon={<FiEye />}
+            >
+              Ver todas
+            </Button>
+            </Link>
+        )}
+        
       </Flex>
 
       <VStack spacing="0" align="stretch">

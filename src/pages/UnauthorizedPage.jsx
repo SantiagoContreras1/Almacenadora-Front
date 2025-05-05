@@ -1,8 +1,16 @@
-import React from 'react';
-import { Box, Button, Heading, Text, Center } from '@chakra-ui/react';
-import { Link } from 'react-router-dom'; // Si estás usando React Router
+import React from "react";
+import { Box, Button, Heading, Text, Center } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../features/auth/authSlice";
 
 const UnauthorizedPage = () => {
+  const dispatch = useDispatch();
+
+  const handleClick = () => {
+    dispatch(logout());
+  };
+
   return (
     <Center h="100vh" flexDirection="column" textAlign="center">
       <Box
@@ -25,6 +33,10 @@ const UnauthorizedPage = () => {
             Volver a la página de inicio
           </Button>
         </Link>
+
+        <Button colorScheme="red" mr={3} onClick={handleClick}>
+          Iniciar Sesion
+        </Button>
       </Box>
     </Center>
   );

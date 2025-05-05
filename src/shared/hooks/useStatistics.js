@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useToast } from "@chakra-ui/react";
-import { getAllMovements as getAllMovementsRequest, getBestSellers as getBestSellersRequest, getLowStockProducts as getLowStockProductsRequest, getWeeklyInventoryMovements as getWeeklyInventoryMovementsRequest } from "../../services/api";
+import { getMovements as getMovementsRequest, getBestSellers as getBestSellersRequest, getLowStockProducts as getLowStockProductsRequest, getWeeklyInventoryMovements as getWeeklyInventoryMovementsRequest } from "../../services/api";
 export const useStatistics = () => {
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -8,7 +8,7 @@ export const useStatistics = () => {
   const getMovements = async () => {
     setIsLoading(true);
 
-    const response = await getAllMovementsRequest();
+    const response = await getMovementsRequest();
 
     if (response.error) {
       toast({

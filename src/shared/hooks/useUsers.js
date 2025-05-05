@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getUsers as getUsersRequest, editUser as editUserRequest, deleteUser as deleteUserRequest } from "../../services/api";
+import { getUsers as getUsersRequest, editUser as editUserRequest, deleteUser as deleteUserRequest, changePassword as changePasswordRequest } from "../../services/api";
 import { useToast } from "@chakra-ui/react";
 export const useUsers = () => {
   const toast = useToast();
@@ -45,6 +45,23 @@ export const useUsers = () => {
     }
   };
 
+  const changePassword = async (id, data) => {
+    const response = await changePasswordRequest(id, data);
+    
+    if (response.error) {
+      toast({
+        title: "Update User Failed",
+        description:
+          response.error?.response?.data || "An error occurred during Update",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+      setIsLoading(false);
+      return;
+    }
+  }
+
   const deleteUser = async (id) => {
     setIsLoading(true)
     console.log(id)
@@ -66,6 +83,7 @@ export const useUsers = () => {
 
   return {
     deleteUser,
+    changePassword,
     getUsers,
     updateUser,
     isLoading,

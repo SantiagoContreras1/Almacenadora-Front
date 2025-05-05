@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { getProducts as getProductsRequest, saveProduct as saveProductRequest, editProduct as editProductRequest, deleteProduct as deleteProductRequest } from "../../services/api";
+import {
+  getProducts as getProductsRequest,
+  totalStock as totalStockRequest,
+  saveProduct as saveProductRequest,
+  editProduct as editProductRequest,
+  deleteProduct as deleteProductRequest,
+} from "../../services/api";
 import { useToast } from "@chakra-ui/react";
 export const useProducts = () => {
   const toast = useToast();
@@ -29,7 +35,7 @@ export const useProducts = () => {
   const saveProduct = async (newProduct) => {
     setIsLoading(true);
 
-    const response = await saveProductRequest( newProduct);
+    const response = await saveProductRequest(newProduct);
 
     if (response.error) {
       toast({
@@ -65,9 +71,9 @@ export const useProducts = () => {
   };
 
   const deleteProduct = async (id) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
-    const response = await deleteProductRequest(id)
+    const response = await deleteProductRequest(id);
     if (response.error) {
       toast({
         title: "Delete product Failed",
@@ -80,13 +86,38 @@ export const useProducts = () => {
       setIsLoading(false);
       return;
     }
-  }
+  };
+
+  const totalStock = async () => {
+    setIsLoading(true);
+
+    const response = await totalStockRequest();
+
+    if (response.error) {
+      toast({
+        title: "get stock Failed",
+        description:
+          response.error?.response?.data || "An error occurred during getting",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(false);
+    return {
+      totalValue: response.data.totalValue,
+    };
+  };
 
   return {
     deleteProduct,
     getProducts,
     updateProduct,
     saveProduct,
+    totalStock,
     isLoading,
   };
 };

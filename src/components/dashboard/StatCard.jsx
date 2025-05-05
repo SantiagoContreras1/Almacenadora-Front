@@ -13,11 +13,9 @@ import {
 export const StatCard = ({
   title,
   value,
-  change,
   icon,
   color = "blue.500",
 }) => {
-  const isPositiveChange = change >= 0;
 
   return (
     <Box
@@ -38,12 +36,6 @@ export const StatCard = ({
         <StatNumber fontSize="2xl" fontWeight="bold">
           {value}
         </StatNumber>
-        <StatHelpText>
-          <Flex align="center">
-            <StatArrow type={isPositiveChange ? "increase" : "decrease"} />
-            {Math.abs(change)}% desde el mes pasado
-          </Flex>
-        </StatHelpText>
       </Stat>
     </Box>
   );

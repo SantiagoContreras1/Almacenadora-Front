@@ -6,6 +6,7 @@ import {
   Button,
   VStack,
   useDisclosure,
+  FormErrorMessage
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { GenericAlert } from "../GenericAlert";
@@ -18,6 +19,7 @@ const SupplierForm = ({ onSave, supplier }) => {
     formState: { errors },
     getValues,
   } = useForm({
+    mode: "onChange", // Validación en tiempo real
     defaultValues: {
       nombre: "",
       contacto: "",
@@ -36,9 +38,7 @@ const SupplierForm = ({ onSave, supplier }) => {
   } = useDisclosure();
 
   useEffect(() => {
-    if (supplier) {
-      reset(supplier);
-    }
+    if (supplier) reset(supplier);
   }, [supplier, reset]);
 
   const confirmEdit = () => {
@@ -52,7 +52,6 @@ const SupplierForm = ({ onSave, supplier }) => {
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    
     if (supplier) {
       onConfirmAlertOpen();
     } else {
@@ -66,16 +65,14 @@ const SupplierForm = ({ onSave, supplier }) => {
         <VStack spacing={4}>
           <FormControl isInvalid={errors.nombre}>
             <FormLabel>Nombre</FormLabel>
-            <Input
-              {...register("nombre", { required: "Este campo es requerido" })}
-            />
+            <Input {...register("nombre", { required: "Este campo es requerido" })} />
+            <FormErrorMessage>{errors.nombre?.message}</FormErrorMessage>
           </FormControl>
 
           <FormControl isInvalid={errors.contacto}>
             <FormLabel>Contacto</FormLabel>
-            <Input
-              {...register("contacto", { required: "Este campo es requerido" })}
-            />
+            <Input {...register("contacto", { required: "Este campo es requerido" })} />
+            <FormErrorMessage>{errors.contacto?.message}</FormErrorMessage>
           </FormControl>
 
           <FormControl isInvalid={errors.email}>
@@ -90,20 +87,23 @@ const SupplierForm = ({ onSave, supplier }) => {
                 },
               })}
             />
+            <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
           </FormControl>
 
           <FormControl isInvalid={errors.telefono}>
             <FormLabel>Teléfono</FormLabel>
             <Input
-              {...register("telefono", { required: "Este campo es requerido" })}
+              {...register("telefono", {
+                required: "Este campo es requerido",
+              })}
             />
+            <FormErrorMessage>{errors.telefono?.message}</FormErrorMessage>
           </FormControl>
 
           <FormControl isInvalid={errors.direccion}>
             <FormLabel>Dirección</FormLabel>
-            <Input
-              {...register("direccion", { required: "Este campo es requerido" })}
-            />
+            <Input {...register("direccion", { required: "Este campo es requerido" })} />
+            <FormErrorMessage>{errors.direccion?.message}</FormErrorMessage>
           </FormControl>
 
           <Button colorScheme="teal" type="submit">
@@ -111,7 +111,7 @@ const SupplierForm = ({ onSave, supplier }) => {
           </Button>
         </VStack>
       </form>
-      
+
       <GenericAlert
         isOpen={isConfirmAlertOpen}
         onClose={onConfirmAlertClose}

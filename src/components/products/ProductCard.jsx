@@ -9,6 +9,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRef } from "react";
+import { useSelector } from "react-redux";
 import { ProductDetailModal } from "./ProductDetailModal";
 import { GenericAlert } from "../GenericAlert";
 
@@ -24,6 +25,8 @@ export const ProductCard = ({ product, onEdit, onDelete }) => {
     onOpen: onDetailModalOpen,
     onClose: onDetailModalClose,
   } = useDisclosure();
+
+  const { isAdmin } = useSelector((state) => state.auth);
 
   const cancelRef = useRef();
 
@@ -45,11 +48,14 @@ export const ProductCard = ({ product, onEdit, onDelete }) => {
         <CardBody p="3">
           <Box onClick={handleCardClick} cursor="pointer">
             <Image
-              src={product.image || "https://via.placeholder.com/150"}
+              src={
+                product.image ||
+                "https://static-00.iconduck.com/assets.00/no-image-icon-2048x2048-2t5cx953.png"
+              }
               alt={product.name}
               borderRadius="md"
               mb="2"
-              objectFit="cover"
+              objectFit="contain"
               height="150px"
               width="100%"
             />
@@ -60,15 +66,16 @@ export const ProductCard = ({ product, onEdit, onDelete }) => {
               Q{product.price?.toFixed(2) || "0.00"}
             </Text>
           </Box>
-
-          <Box mt="3" display="flex" justifyContent="space-between">
-            <Button size="sm" colorScheme="blue" onClick={onEdit}>
-              Editar
-            </Button>
-            <Button size="sm" colorScheme="red" onClick={onDeleteAlertOpen}>
-              Eliminar
-            </Button>
-          </Box>
+          {isAdmin && (
+            <Box mt="3" display="flex" justifyContent="space-between">
+              <Button size="sm" colorScheme="blue" onClick={onEdit}>
+                Editar
+              </Button>
+              <Button size="sm" colorScheme="red" onClick={onDeleteAlertOpen}>
+                Eliminar
+              </Button>
+            </Box>
+          )}
         </CardBody>
       </Card>
 

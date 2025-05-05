@@ -11,6 +11,7 @@ import {
   Select,
   FormControl,
   FormLabel,
+  FormErrorMessage,
   useToast,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -18,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState, useRef } from "react";
 import { useSuppliers } from "../../shared/hooks/useSuppliers";
 import { GenericAlert } from "../GenericAlert";
+import { isValid } from "date-fns";
 
 export const ProductModal = ({
   isOpen,
@@ -33,7 +35,9 @@ export const ProductModal = ({
     reset,
     formState: { errors },
     getValues,
-  } = useForm();
+    watch,
+    trigger
+  } = useForm({mode: "onChange"});
 
   const [suppliers, setSuppliers] = useState([]);
   const { getSuppliers } = useSuppliers();
@@ -66,7 +70,6 @@ export const ProductModal = ({
         }
       };
 
-      console.log(product)
       if (product) {
         reset({
           name: product.name || "",
@@ -100,26 +103,33 @@ export const ProductModal = ({
     onClose();
   };
 
-  
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
-
-    
+  
+    const isValid = await trigger();
+    if (!isValid) return; 
+  
     if (isEdit) {
       onConfirmAlertOpen();
     } else {
       handleSubmit(onSubmit)();
     }
   };
-
   
+
   const confirmEdit = () => {
     handleSubmit(onSubmit)();
     onConfirmAlertClose();
   };
 
   const onSubmit = (data) => {
-    onSave(data);
+    const payload = {
+      ...data,
+      stock: Number(data.stock),
+      price: Number(data.price),
+    };
+
+    onSave(payload);
     toast({
       title: isEdit ? "Producto actualizado" : "Producto registrado",
       status: "success",
@@ -128,6 +138,9 @@ export const ProductModal = ({
     });
     handleClose();
   };
+
+  const entrada = watch("entrada");
+  const vencimiento = watch("vencimiento");
 
   return (
     <>
@@ -143,23 +156,43 @@ export const ProductModal = ({
               <FormControl mb="3" isInvalid={errors.name}>
                 <FormLabel>Nombre del producto</FormLabel>
                 <Input
-                  {...register("name", { required: true })}
+                  {...register("name", {
+                    required: "Este campo es requerido",
+                    minLength: {
+                      value: 3,
+                      message: "Debe tener al menos 3 caracteres",
+                    },
+                    maxLength: {
+                      value: 50,
+                      message: "No puede exceder los 50 caracteres",
+                    },
+                  })}
                   placeholder="Nombre del producto"
                 />
+                <FormErrorMessage>{errors.name?.message}</FormErrorMessage>
               </FormControl>
 
               <FormControl mb="3" isInvalid={errors.image}>
                 <FormLabel>URL de la imagen</FormLabel>
                 <Input
-                  {...register("image", { required: true })}
-                  placeholder="URL de la imagen"
+                  {...register("image", {
+                    required: "Este campo es requerido",
+                    pattern: {
+                      value: /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|webp))$/i,
+                      message: "Debe ser una URL válida de imagen",
+                    },
+                  })}
+                  placeholder="https://ejemplo.com/imagen.jpg"
                 />
+                <FormErrorMessage>{errors.image?.message}</FormErrorMessage>
               </FormControl>
 
               <FormControl mb="3" isInvalid={errors.category}>
                 <FormLabel>Categoría</FormLabel>
                 <Select
-                  {...register("category", { required: true })}
+                  {...register("category", {
+                    required: "Debe seleccionar una categoría",
+                  })}
                   placeholder="Seleccione una categoría"
                 >
                   {categories.map((cat) => (
@@ -168,15 +201,23 @@ export const ProductModal = ({
                     </option>
                   ))}
                 </Select>
+                <FormErrorMessage>{errors.category?.message}</FormErrorMessage>
               </FormControl>
 
               <FormControl mb="3" isInvalid={errors.stock}>
                 <FormLabel>Cantidad en stock</FormLabel>
                 <Input
                   type="number"
-                  {...register("stock", { required: true })}
+                  {...register("stock", {
+                    required: "Este campo es requerido",
+                    min: {
+                      value: 0,
+                      message: "Debe ser mayor o igual a 0",
+                    },
+                  })}
                   placeholder="Stock"
                 />
+                <FormErrorMessage>{errors.stock?.message}</FormErrorMessage>
               </FormControl>
 
               <FormControl mb="3" isInvalid={errors.price}>
@@ -184,15 +225,24 @@ export const ProductModal = ({
                 <Input
                   type="number"
                   step="0.01"
-                  {...register("price", { required: true })}
+                  {...register("price", {
+                    required: "Este campo es requerido",
+                    min: {
+                      value: 0,
+                      message: "Debe ser mayor o igual a 0",
+                    },
+                  })}
                   placeholder="Precio"
                 />
+                <FormErrorMessage>{errors.price?.message}</FormErrorMessage>
               </FormControl>
 
               <FormControl mb="3" isInvalid={errors.proveedor}>
                 <FormLabel>Proveedor</FormLabel>
                 <Select
-                  {...register("proveedor", { required: true })}
+                  {...register("proveedor", {
+                    required: "Debe seleccionar un proveedor",
+                  })}
                   placeholder="Seleccione un proveedor"
                 >
                   {suppliers.map((sup) => (
@@ -201,35 +251,50 @@ export const ProductModal = ({
                     </option>
                   ))}
                 </Select>
+                <FormErrorMessage>{errors.proveedor?.message}</FormErrorMessage>
               </FormControl>
 
-              <FormControl mb="3" isInvalid={errors.entryDate}>
+              <FormControl mb="3" isInvalid={errors.entrada}>
                 <FormLabel>Fecha de entrada</FormLabel>
                 <Input
                   type="date"
-                  {...register("entrada", { required: true })}
+                  {...register("entrada", {
+                    required: "La fecha de entrada es obligatoria",
+                  })}
                 />
+                <FormErrorMessage>{errors.entrada?.message}</FormErrorMessage>
               </FormControl>
 
-              <FormControl mb="3" isInvalid={errors.expiration}>
-                <FormLabel>Fecha de Vencimiento</FormLabel>
+              <FormControl mb="3" isInvalid={errors.vencimiento}>
+                <FormLabel>Fecha de vencimiento</FormLabel>
                 <Input
                   type="date"
-                  {...register("vencimiento", { required: true })}
+                  {...register("vencimiento", {
+                    validate: (value) => {
+                      if (value && entrada && value < entrada) {
+                        return "La fecha de vencimiento debe ser posterior a la de entrada";
+                      }
+                      return true;
+                    },
+                  })}
                 />
+                <FormErrorMessage>{errors.vencimiento?.message}</FormErrorMessage>
               </FormControl>
 
-              <FormControl mb="3">
+              <FormControl mb="3" isInvalid={errors.description}>
                 <FormLabel>Descripción</FormLabel>
                 <Input
-                  {...register("description")}
+                  {...register("description", {
+                    required: "la descripción es obligatoria",
+                  })}
                   placeholder="Descripción del producto"
                 />
+                <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
               </FormControl>
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="teal" mr={3} type="submit">
+              <Button colorScheme="teal" mr={3} type="submit" isDisabled={isValid}>
                 {isEdit ? "Actualizar" : "Guardar"}
               </Button>
               <Button onClick={handleClose}>Cancelar</Button>
@@ -238,7 +303,6 @@ export const ProductModal = ({
         </ModalContent>
       </Modal>
 
-      
       <GenericAlert
         isOpen={isConfirmAlertOpen}
         onClose={onConfirmAlertClose}

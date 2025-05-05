@@ -12,6 +12,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { FiEye } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 const MovementTypeText = ({ type }) => {
   const color = type === "Entrada" ? "green.500" : "red.500";
@@ -21,6 +22,16 @@ const MovementTypeText = ({ type }) => {
       {type}
     </Text>
   );
+};
+
+const formatDate = (dateString) => {
+  try {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  } catch (e) {
+    console.error("Error formateando fecha:", e);
+    return "";
+  }
 };
 
 export const MovementsTable = ({
@@ -41,14 +52,16 @@ export const MovementsTable = ({
           {title}
         </Text>
         {showViewAll && (
+          <Link to="/movements">
           <Button
             variant="link"
             size="sm"
             colorScheme="blue"
             rightIcon={<FiEye />}
           >
-            Ver todos
+            Ver Todos
           </Button>
+          </Link>
         )}
       </Flex>
 
@@ -65,13 +78,13 @@ export const MovementsTable = ({
         <Tbody>
           {movements.map((movement) => (
             <Tr key={movement.id}>
-              <Td>{movement.product}</Td>
+              <Td>{movement.productName}</Td>
               <Td>
                 <MovementTypeText type={movement.type} />
               </Td>
               <Td isNumeric>{movement.quantity}</Td>
               <Td>{movement.user}</Td>
-              <Td>{movement.date}</Td>
+              <Td>{formatDate(movement.date)}</Td>
             </Tr>
           ))}
         </Tbody>

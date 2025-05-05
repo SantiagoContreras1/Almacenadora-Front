@@ -14,6 +14,7 @@ import { ProductCard } from "../components/products/ProductCard";
 import { useDisclosure } from "@chakra-ui/react";
 import { ProductModal } from "../components/products/ProductModal";
 import { useCategories } from "../shared/hooks/useCategories";
+import { useNotifications } from "../shared/hooks/useNotifications";
 
 const ProductsPage = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -24,6 +25,8 @@ const ProductsPage = () => {
   const { getCategories } = useCategories();
   const toast = useToast();
   const { getProducts, saveProduct, updateProduct, deleteProduct } = useProducts();
+
+  useNotifications();
 
   const fetchData = async () => {
     const productsFromApi = await getProducts();

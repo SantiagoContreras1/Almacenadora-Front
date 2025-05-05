@@ -5,8 +5,6 @@ import {
   IconButton,
   VStack,
   HStack,
-  Avatar,
-  Badge,
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -15,33 +13,35 @@ import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { GenericAlert } from "../GenericAlert";
 
-const ClientList = ({ clients, onEdit, onDelete }) => {
+const CategoryList = ({ categories, onEdit, onDelete }) => {
   const bgItem = useColorModeValue("gray.50", "gray.700");
-  const isAdmin = useSelector((state) => state.auth.isAdmin);
-
-  const [selectedClient, setSelectedClient] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const cancelRef = useRef();
 
   const {
-    isOpen,
-    onOpen,
-    onClose,
+    isOpen: isDeleteAlertOpen,
+    onOpen: onDeleteAlertOpen,
+    onClose: onDeleteAlertClose,
   } = useDisclosure();
 
-  const handleDeleteClick = (client) => {
-    setSelectedClient(client);
-    onOpen();
+  const isAdmin = useSelector((state) => state.auth.isAdmin);
+
+  const handleDeleteClick = (category) => {
+    setSelectedCategory(category);
+    onDeleteAlertOpen();
   };
 
   const handleConfirmDelete = () => {
-    onDelete(selectedClient.uid, selectedClient.nombre);
-    onClose();
+    if (selectedCategory) {
+      onDelete(selectedCategory.uid, selectedCategory.name);
+      onDeleteAlertClose();
+    }
   };
 
-  if (!clients.length) {
+  if (!categories.length) {
     return (
       <Box p={6} textAlign="center">
-        <Text color="gray.500">No hay clientes para mostrar.</Text>
+        <Text color="gray.500">No hay categorias para mostrar.</Text>
       </Box>
     );
   }
@@ -49,9 +49,9 @@ const ClientList = ({ clients, onEdit, onDelete }) => {
   return (
     <>
       <VStack align="stretch" spacing={0}>
-        {clients.map((client, idx) => (
+        {categories.map((category, index) => (
           <Box
-            key={client.uid || idx}
+            key={category.uid || index}
             p={4}
             _hover={{ bg: bgItem }}
             borderBottom="1px solid"
@@ -59,34 +59,30 @@ const ClientList = ({ clients, onEdit, onDelete }) => {
           >
             <Flex justify="space-between" align="center">
               <HStack>
-                <Avatar name={client.nombre} />
                 <Box>
                   <HStack>
-                    <Text fontWeight="bold">{client.nombre}</Text>
-                    <Badge colorScheme={client.tipo === "empresa" ? "purple" : "green"}>
-                      {client.tipo}
-                    </Badge>
+                    <Text fontWeight="bold">{category.name}</Text>
                   </HStack>
-                  {client.email && <Text fontSize="sm" color="gray.500">{client.email}</Text>}
-                  {client.telefono && <Text fontSize="sm" color="gray.500">Tel: {client.telefono}</Text>}
-                  {client.direccion && <Text fontSize="sm" color="gray.500">Dir: {client.direccion}</Text>}
+                  <Text fontSize="sm" color="gray.500">
+                    Descripción: {category.description}
+                  </Text>
                 </Box>
               </HStack>
               {isAdmin && (
                 <HStack>
                   <IconButton
-                    aria-label="Editar cliente"
+                    aria-label="Editar categoria"
                     icon={<FaEdit />}
                     colorScheme="blue"
                     variant="ghost"
-                    onClick={() => onEdit(client)}
+                    onClick={() => onEdit(category)}
                   />
                   <IconButton
-                    aria-label="Eliminar cliente"
+                    aria-label="Eliminar categoria"
                     icon={<FaTrash />}
                     colorScheme="red"
                     variant="ghost"
-                    onClick={() => handleDeleteClick(client)}
+                    onClick={() => handleDeleteClick(category)}
                   />
                 </HStack>
               )}
@@ -96,14 +92,15 @@ const ClientList = ({ clients, onEdit, onDelete }) => {
       </VStack>
 
       <GenericAlert
-        isOpen={isOpen}
-        onClose={onClose}
+        isOpen={isDeleteAlertOpen}
+        onClose={onDeleteAlertClose}
         cancelRef={cancelRef}
         onConfirm={handleConfirmDelete}
-        title="Eliminar Cliente"
+        title="Eliminar Categoría"
         description={
           <>
-            ¿Está seguro que desea eliminar al cliente <strong>{selectedClient?.nombre}</strong>? Esta acción no se puede deshacer.
+            ¿Está seguro que desea eliminar la categoría{" "}
+            <strong>{selectedCategory?.name}</strong>? Esta acción no se puede deshacer.
           </>
         }
         confirmButtonText="Eliminar"
@@ -113,4 +110,4 @@ const ClientList = ({ clients, onEdit, onDelete }) => {
   );
 };
 
-export default ClientList;
+export default CategoryList;

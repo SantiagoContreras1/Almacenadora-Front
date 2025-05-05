@@ -43,7 +43,10 @@ export const ProductDetailModal = ({ isOpen, onClose, product }) => {
           <Grid templateColumns="repeat(2, 1fr)" gap={4}>
             <GridItem colSpan={[2, 1]}>
               <Image
-                src={product.image || "https://www.fifpro.org/media/ovzgbezo/messi_w11_2024.jpg"}
+                src={
+                  product.image ||
+                  "https://www.fifpro.org/media/ovzgbezo/messi_w11_2024.jpg"
+                }
                 alt={product.name}
                 borderRadius="md"
                 objectFit="cover"
@@ -89,6 +92,13 @@ export const ProductDetailModal = ({ isOpen, onClose, product }) => {
                 <Box>
                   <Text fontWeight="bold">Fecha de entrada:</Text>
                   <Text>{formatDate(product.entrada)}</Text>
+
+                  {product.vencimiento && (
+                    <>
+                      <Text fontWeight="bold">Fecha de Vencimiento:</Text>{" "}
+                      <Text>{formatDate(product.vencimiento)}</Text>
+                    </>
+                  )}
                 </Box>
                 <Box>
                   <Text fontWeight="bold">ID del producto:</Text>
