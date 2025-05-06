@@ -13,22 +13,21 @@ import {
   MenuItem,
   IconButton,
   useColorModeValue,
-  Badge
+  Badge,
+  useColorMode,
+  Tooltip
 } from "@chakra-ui/react";
-import { FiSearch, FiUser, FiLogOut, FiBell } from "react-icons/fi";
+import { FiSearch, FiUser, FiLogOut, FiBell, FiMoon, FiSun } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
-
-
-
-
 
 export const TopBar = ({ isSearch, handleChange }) => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const notifications = useSelector((state) => state.notifications);
+  const { colorMode, toggleColorMode } = useColorMode();
 
   const handleLogout = () => {
     navigate("/auth");
@@ -36,10 +35,8 @@ export const TopBar = ({ isSearch, handleChange }) => {
   };
 
   const handleProfile = () => {
-    navigate("/profile")
-  }
-
-    
+    navigate("/profile");
+  };
 
   return (
     <Flex
@@ -72,6 +69,15 @@ export const TopBar = ({ isSearch, handleChange }) => {
       )}
 
       <HStack spacing="4">
+        <Tooltip label={colorMode === "light" ? "Modo oscuro" : "Modo claro"}>
+          <IconButton
+            aria-label={colorMode === "light" ? "Cambiar a modo oscuro" : "Cambiar a modo claro"}
+            icon={colorMode === "light" ? <FiMoon /> : <FiSun />}
+            onClick={toggleColorMode}
+            variant="ghost"
+          />
+        </Tooltip>
+
         <Menu>
           <MenuButton as={IconButton} icon={<FiBell />} variant="ghost" position="relative">
             {notifications.length > 0 && (

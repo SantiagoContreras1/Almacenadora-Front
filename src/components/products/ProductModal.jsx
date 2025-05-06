@@ -12,7 +12,6 @@ import {
   FormControl,
   FormLabel,
   FormErrorMessage,
-  useToast,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
@@ -41,7 +40,6 @@ export const ProductModal = ({
 
   const [suppliers, setSuppliers] = useState([]);
   const { getSuppliers } = useSuppliers();
-  const toast = useToast();
   const cancelRef = useRef();
 
   const {
@@ -71,6 +69,7 @@ export const ProductModal = ({
       };
 
       if (product) {
+        console.log(product)
         reset({
           name: product.name || "",
           category: product.category?._id || "",
@@ -130,12 +129,6 @@ export const ProductModal = ({
     };
 
     onSave(payload);
-    toast({
-      title: isEdit ? "Producto actualizado" : "Producto registrado",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
     handleClose();
   };
 
@@ -288,7 +281,7 @@ export const ProductModal = ({
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="teal" mr={3} type="submit" isDisabled={isValid}>
+              <Button colorScheme="teal" mr={3} type="submit" disabled={isValid}>
                 {isEdit ? "Actualizar" : "Guardar"}
               </Button>
               <Button onClick={handleClose}>Cancelar</Button>
