@@ -25,33 +25,46 @@ import { FaBell, FaSearch } from "react-icons/fa";
 import { AlertSection } from "../components/dashboard/AlertSection";
 import { useNotifications } from "../shared/hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
+import Pagination from "../components/Pagination.jsx";
 
 const transformNotification = (notif) => {
-    let title = "Notificación";
-    let type = "info";
-  
-    if (notif.type === "EXPIRATION") {
-      title = "Producto próximo a vencer";
-      type = "warning";
-    } else if (notif.type === "LOW_STOCK") {
-      title = "Stock bajo";
-      type = "danger";
-    }
-  
-    return {
-      id: notif.uid,
-      type,
-      title,
-      message: notif.message,
-      time: formatDistanceToNow(new Date(notif.date), { addSuffix: true})
-    };
+  let title = "Notificación";
+  let type = "info";
+
+  if (notif.type === "EXPIRATION") {
+    title = "Producto próximo a vencer";
+    type = "warning";
+  } else if (notif.type === "LOW_STOCK") {
+    title = "Stock bajo";
+    type = "danger";
+  }
+
+  return {
+    id: notif.uid,
+    type,
+    title,
+    message: notif.message,
+    time: formatDistanceToNow(new Date(notif.date), { addSuffix: true }),
   };
-  
+};
 
 const NotificationsPage = () => {
   const [alerts, setAlerts] = useState([]);
   const [search, setSearch] = useState("");
   const { getNotifications } = useNotifications();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const totalItems = alerts.length;
+  const totalPages = Math.ceil(totalItems / limit);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (newLimit) => {
+    setLimit(newLimit);
+    setPage(1);
+  };
 
   const bg = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
@@ -60,14 +73,12 @@ const NotificationsPage = () => {
 
   const fetchData = async () => {
     const NotificationsFromApi = await getNotifications();
-  
+
     if (NotificationsFromApi) {
       const formatted = NotificationsFromApi.map(transformNotification);
       setAlerts(formatted);
-
     }
   };
-  
 
   useEffect(() => {
     fetchData();
@@ -130,15 +141,22 @@ const NotificationsPage = () => {
             <CardHeader borderBottom="1px" borderColor={borderColor}>
               <Flex justify="space-between" align="center">
                 <Heading size="md">Listado de Notificaciones</Heading>
-                <Text color="gray.500">
-                  {filteredAlerts.length} resultados
-                </Text>
+                <Text color="gray.500">{filteredAlerts.length} resultados</Text>
               </Flex>
             </CardHeader>
             <CardBody p={0}>
               <AlertSection alerts={filteredAlerts} all={true} />
             </CardBody>
           </Card>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={totalItems}
+            itemsPerPage={limit}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            showItemCount={true}
+          />
         </Box>
       </Box>
     </Box>

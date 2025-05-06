@@ -5,11 +5,16 @@ import {
   IconButton,
   VStack,
   useDisclosure,
+  HStack,
+  Button,
+  Tooltip,
+  Badge
 } from "@chakra-ui/react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaBox } from "react-icons/fa";
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { GenericAlert } from "../GenericAlert";
+import SupplierProducts from "./SupplierProducts";
 
 const SupplierList = ({ suppliers, onEdit, onDelete }) => {
   const [selectedSupplier, setSelectedSupplier] = useState(null);
@@ -19,6 +24,12 @@ const SupplierList = ({ suppliers, onEdit, onDelete }) => {
     isOpen: isDeleteAlertOpen,
     onOpen: onDeleteAlertOpen,
     onClose: onDeleteAlertClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isProductsModalOpen,
+    onOpen: onProductsModalOpen,
+    onClose: onProductsModalClose,
   } = useDisclosure();
 
   const isAdmin = useSelector((state) => state.auth.isAdmin);
@@ -35,6 +46,11 @@ const SupplierList = ({ suppliers, onEdit, onDelete }) => {
     }
   };
 
+  const handleViewProducts = (supplier) => {
+    setSelectedSupplier(supplier);
+    onProductsModalOpen();
+  };
+
   return (
     <>
       <VStack spacing={4} align="stretch" p={4}>
@@ -42,7 +58,12 @@ const SupplierList = ({ suppliers, onEdit, onDelete }) => {
           <Box key={supplier.uid} p={4} borderWidth="1px" borderRadius="md">
             <Flex justify="space-between" align="center">
               <Box>
-                <Text fontWeight="bold">{supplier.nombre}</Text>
+                <Flex align="center" gap={2}>
+                  <Text fontWeight="bold">{supplier.nombre}</Text>
+                  <Badge colorScheme="blue" fontSize="xs">
+                    {supplier.productos?.length || 0} productos
+                  </Badge>
+                </Flex>
                 <Text fontSize="sm" color="gray.500">
                   Contacto: {supplier.contacto} - {supplier.email}
                 </Text>
@@ -53,23 +74,32 @@ const SupplierList = ({ suppliers, onEdit, onDelete }) => {
                   Direccion: {supplier.direccion}
                 </Text>
               </Box>
-              {isAdmin && (
-                <Box>
+              <HStack>
+                <Tooltip label="Ver productos">
                   <IconButton
-                    aria-label="Editar"
-                    icon={<FaEdit />}
-                    colorScheme="blue"
-                    mr={2}
-                    onClick={() => onEdit(supplier)}
+                    aria-label="Ver productos"
+                    icon={<FaBox />}
+                    colorScheme="teal"
+                    onClick={() => handleViewProducts(supplier)}
                   />
-                  <IconButton
-                    aria-label="Eliminar"
-                    icon={<FaTrash />}
-                    colorScheme="red"
-                    onClick={() => handleDeleteClick(supplier)}
-                  />
-                </Box>
-              )}
+                </Tooltip>
+                {isAdmin && (
+                  <>
+                    <IconButton
+                      aria-label="Editar"
+                      icon={<FaEdit />}
+                      colorScheme="blue"
+                      onClick={() => onEdit(supplier)}
+                    />
+                    <IconButton
+                      aria-label="Eliminar"
+                      icon={<FaTrash />}
+                      colorScheme="red"
+                      onClick={() => handleDeleteClick(supplier)}
+                    />
+                  </>
+                )}
+              </HStack>
             </Flex>
           </Box>
         ))}
@@ -96,6 +126,14 @@ const SupplierList = ({ suppliers, onEdit, onDelete }) => {
         confirmButtonText="Eliminar"
         confirmButtonColor="red"
       />
+
+      {selectedSupplier && (
+        <SupplierProducts
+          isOpen={isProductsModalOpen}
+          onClose={onProductsModalClose}
+          supplier={selectedSupplier}
+        />
+      )}
     </>
   );
 };

@@ -22,6 +22,7 @@ export const useSuppliers = () => {
       setIsLoading(false);
       return;
     }
+    
     const suppliers = response.data.proveedores;
     return suppliers;
   };
@@ -43,6 +44,14 @@ export const useSuppliers = () => {
       setIsLoading(false);
       return;
     }
+    toast({
+      title: "Proveedor guardado",
+      description: `El proveedor ha sido guardado con éxito.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    })
+    setIsLoading(false)
   }
 
   const updateSupplier = async (id, data) => {
@@ -62,6 +71,14 @@ export const useSuppliers = () => {
       setIsLoading(false);
       return;
     }
+    toast({
+      title: "Proveedor actualizado",
+      description: `El proveedor ha sido actualizado con éxito.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    })
+    setIsLoading(false)
   };
 
   const deleteSupplier = async (id) => {
@@ -80,6 +97,14 @@ export const useSuppliers = () => {
       setIsLoading(false);
       return;
     }
+    toast({
+      title: "Proveedor eliminado",
+      description: `El proveedor ha sido eliminado con éxito.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    })
+    setIsLoading(false)
   }
 
 

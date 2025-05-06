@@ -33,20 +33,33 @@ import { FaUser, FaSearch, FaPlus } from "react-icons/fa";
 import CategoryForm from "../components/categories/CategoryForm.jsx";
 import CategoryList from "../components/categories/CategoryList.jsx";
 import { useCategories } from "../shared/hooks/useCategories.js";
-
+import Pagination from "../components/Pagination";
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const totalItems = categories.length;
+  const totalPages = Math.ceil(totalItems / limit);
 
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (newLimit) => {
+    setLimit(newLimit);
+    setPage(1);
+  };
   const bg = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
   const titleColor = useColorModeValue("teal.600", "teal.300");
   const borderColor = useColorModeValue("gray.200", "gray.600");
 
-  const { getCategories, saveCategory, editCategory, deleteCategory } = useCategories();
+  const { getCategories, saveCategory, editCategory, deleteCategory } =
+    useCategories();
 
   const fetchData = async () => {
     const CategoriesFromApi = await getCategories();
@@ -58,7 +71,7 @@ const CategoriesPage = () => {
 
   useEffect(() => {
     fetchData();
-  },[]);
+  }, []);
 
   const handleSave = async (data) => {
     if (selectedCategory) {
@@ -156,7 +169,7 @@ const CategoriesPage = () => {
               </Flex>
             </CardHeader>
             <CardBody p={0}>
-            <CategoryList
+              <CategoryList
                 categories={filteredCategories}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
@@ -164,6 +177,15 @@ const CategoriesPage = () => {
             </CardBody>
           </Card>
         </Box>
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={totalItems}
+          itemsPerPage={limit}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          showItemCount={true}
+        />
       </Box>
 
       <Modal isOpen={isOpen} onClose={onClose} size="xl">

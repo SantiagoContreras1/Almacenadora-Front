@@ -22,6 +22,7 @@ export const useClients = () => {
       setIsLoading(false);
       return;
     }
+    setIsLoading(false);
     const clients = response.data.clients;
     return clients;
   };
@@ -43,6 +44,14 @@ export const useClients = () => {
       setIsLoading(false);
       return;
     }
+    toast({
+      title: "Cliente guardado",
+      description: `El cliente ha sido guardado con éxito.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    })
+    setIsLoading(false)
   }
 
   const updateClient = async (id, data) => {
@@ -62,6 +71,14 @@ export const useClients = () => {
       setIsLoading(false);
       return;
     }
+    toast({
+      title: "Cliente actualizado",
+      description: `El cliente ha sido actualizado con éxito.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    })
+    setIsLoading(false)
   };
 
   const deleteClient = async (id) => {
@@ -80,6 +97,14 @@ export const useClients = () => {
       setIsLoading(false);
       return;
     }
+    toast({
+      title: "Cliente eliminado",
+      description: `El cliente ha sido eliminado con éxito.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    })
+    setIsLoading(false)
   }
 
 

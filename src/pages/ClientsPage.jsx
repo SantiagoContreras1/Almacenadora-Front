@@ -26,7 +26,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  useToast,
 } from "@chakra-ui/react";
 import { SideBar } from "../components/dashboard/SideBar";
 import { TopBar } from "../components/dashboard/TopBar";
@@ -34,13 +33,26 @@ import { FaUser, FaSearch, FaPlus } from "react-icons/fa";
 import ClientForm from "../components/clients/ClientForm";
 import ClientList from "../components/clients/ClientList.jsx";
 import { useClients } from "../shared/hooks/useClients.js";
+import Pagination from "../components/Pagination.jsx";
 
 const ClientsPage = () => {
   const [clients, setClients] = useState([]);
   const [search, setSearch] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedClient, setSelectedClient] = useState(null);
-  const toast = useToast();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const totalItems = clients.length;
+  const totalPages = Math.ceil(totalItems / limit);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (newLimit) => {
+    setLimit(newLimit);
+    setPage(1);
+  };
 
   const bg = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
@@ -52,9 +64,8 @@ const ClientsPage = () => {
   const fetchData = async () => {
     const clientsFromApi = await getClients();
     if (clientsFromApi) {
-        console.log(clientsFromApi)
+      console.log(clientsFromApi);
       setClients(clientsFromApi);
-      
     }
   };
 
@@ -65,24 +76,8 @@ const ClientsPage = () => {
   const handleSave = async (data) => {
     if (selectedClient) {
       await updateClient(selectedClient.uid, data);
-      toast({
-        title: "Cliente actualizado",
-        description: "El cliente ha sido actualizado con éxito.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-        position: "bottom-right",
-      });
     } else {
       await saveClient(data);
-      toast({
-        title: "Cliente agregado",
-        description: "El cliente ha sido registrado con éxito.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-        position: "bottom-right",
-      });
     }
     fetchData();
     onClose();
@@ -93,17 +88,9 @@ const ClientsPage = () => {
     onOpen();
   };
 
-  const handleDelete = async (id, name) => {
+  const handleDelete = async (id) => {
     await deleteClient(id);
     fetchData();
-    toast({
-      title: "Cliente eliminado",
-      description: `${name} ha sido eliminado correctamente.`,
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-      position: "bottom-right",
-    });
   };
 
   const handleOpenCreate = () => {
@@ -111,10 +98,11 @@ const ClientsPage = () => {
     onOpen();
   };
 
-  const filteredClients = clients.filter((client) =>
-    client.nombre?.toLowerCase().includes(search.toLowerCase()) ||
-    client.email?.toLowerCase().includes(search.toLowerCase()) ||
-    client.telefono?.toLowerCase().includes(search.toLowerCase())
+  const filteredClients = clients.filter(
+    (client) =>
+      client.nombre?.toLowerCase().includes(search.toLowerCase()) ||
+      client.email?.toLowerCase().includes(search.toLowerCase()) ||
+      client.telefono?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -129,7 +117,13 @@ const ClientsPage = () => {
               <Heading size="xl" color={titleColor}>
                 Clientes
               </Heading>
-              <Badge colorScheme="teal" fontSize="lg" px={3} py={1} borderRadius="full">
+              <Badge
+                colorScheme="teal"
+                fontSize="lg"
+                px={3}
+                py={1}
+                borderRadius="full"
+              >
                 {clients.length} registros
               </Badge>
             </HStack>
@@ -170,7 +164,9 @@ const ClientsPage = () => {
             <CardHeader borderBottom="1px" borderColor={borderColor}>
               <Flex justify="space-between" align="center">
                 <Heading size="md">Listado de Clientes</Heading>
-                <Text color="gray.500">{filteredClients.length} resultados</Text>
+                <Text color="gray.500">
+                  {filteredClients.length} resultados
+                </Text>
               </Flex>
             </CardHeader>
             <CardBody p={0}>
@@ -182,6 +178,15 @@ const ClientsPage = () => {
             </CardBody>
           </Card>
         </Box>
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={totalItems}
+          itemsPerPage={limit}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          showItemCount={true}
+        />
       </Box>
 
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
@@ -191,19 +196,20 @@ const ClientsPage = () => {
             <HStack>
               <Avatar icon={<FaUser />} bg={titleColor} />
               <Box>
-                <Text>{selectedClient ? "Editar Cliente" : "Nuevo Cliente"}</Text>
+                <Text>
+                  {selectedClient ? "Editar Cliente" : "Nuevo Cliente"}
+                </Text>
                 <Text fontSize="sm" color="gray.500">
-                  {selectedClient ? "Actualiza la información del cliente" : "Completa todos los campos requeridos"}
+                  {selectedClient
+                    ? "Actualiza la información del cliente"
+                    : "Completa todos los campos requeridos"}
                 </Text>
               </Box>
             </HStack>
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <ClientForm
-              onSave={handleSave}
-              client={selectedClient}
-            />
+            <ClientForm onSave={handleSave} client={selectedClient} />
           </ModalBody>
         </ModalContent>
       </Modal>

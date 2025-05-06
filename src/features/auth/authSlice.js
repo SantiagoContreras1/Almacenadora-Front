@@ -21,7 +21,6 @@ const authSlice = createSlice({
     },
     loadUserFromStorage(state) {
       const storedUser = localStorage.getItem("user");
-      console.log("Usuario almacenado en localStorage:", storedUser);
       if (storedUser) {
         const user = JSON.parse(storedUser);
         state.user = user;

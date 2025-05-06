@@ -175,13 +175,7 @@ export const ProductModal = ({
               <FormControl mb="3" isInvalid={errors.image}>
                 <FormLabel>URL de la imagen</FormLabel>
                 <Input
-                  {...register("image", {
-                    required: "Este campo es requerido",
-                    pattern: {
-                      value: /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|webp))$/i,
-                      message: "Debe ser una URL válida de imagen",
-                    },
-                  })}
+                  {...register("image",)}
                   placeholder="https://ejemplo.com/imagen.jpg"
                 />
                 <FormErrorMessage>{errors.image?.message}</FormErrorMessage>

@@ -33,7 +33,7 @@ export const ProductCard = ({ product, onEdit, onDelete }) => {
   const handleCardClick = () => onDetailModalOpen();
 
   const handleDelete = () => {
-    onDelete(product.uid, product.name);
+    onDelete(product.uid);
     onDeleteAlertClose();
   };
 

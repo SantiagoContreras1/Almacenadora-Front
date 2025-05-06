@@ -28,6 +28,8 @@ export const useProducts = () => {
       setIsLoading(false);
       return;
     }
+    setIsLoading(false);	
+    
     const products = response.data.products;
     return products;
   };
@@ -49,6 +51,14 @@ export const useProducts = () => {
       setIsLoading(false);
       return;
     }
+
+    toast({
+      title: "Producto guardado",
+      description: `El producto ha sido guardado con éxito.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    })
   };
 
   const updateProduct = async (id, newProduct) => {
@@ -68,6 +78,13 @@ export const useProducts = () => {
       setIsLoading(false);
       return;
     }
+    toast({
+      title: "Producto actualizado",
+      description: `El producto ha sido actualizado con éxito.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    })
   };
 
   const deleteProduct = async (id) => {
@@ -86,6 +103,14 @@ export const useProducts = () => {
       setIsLoading(false);
       return;
     }
+    toast({
+      title: "Producto eliminado",
+      description: `El producto ha sido eliminado correctamente.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+      position: "bottom-right",
+    });
   };
 
   const totalStock = async () => {

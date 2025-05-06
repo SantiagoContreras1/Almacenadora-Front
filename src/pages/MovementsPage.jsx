@@ -29,6 +29,7 @@ import { SideBar } from "../components/dashboard/SideBar";
 import { TopBar } from "../components/dashboard/TopBar";
 import MovementForm from "../components/movements/MovementForm";
 import Listmovements from "../components/movements/Listmovements";
+import Pagination from "../components/Pagination";
 import { useMovements } from "../shared/hooks/useMovements";
 import { useProducts } from "../shared/hooks/useProducts";
 import { useNotifications } from "../shared/hooks/useNotifications";
@@ -137,6 +138,10 @@ const MovementsPage = () => {
     setSelectedMovement(null);
     setDefaultType(type);
     onOpen();
+  };
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
   };
 
   const filteredMovements = movements.filter((movement) => {
@@ -303,27 +308,15 @@ const MovementsPage = () => {
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                 />
-                <Flex justify="center" mt={6} gap={4}>
-                  <Button
-                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                    isDisabled={page === 1}
-                  >
-                    Anterior
-                  </Button>
-                  <Text alignSelf="center">
-                    Página {page} de {totalPages}
-                  </Text>
-                  <Button
-                    onClick={() =>
-                      setPage((prev) =>
-                        prev < totalPages ? prev + 1 : prev
-                      )
-                    }
-                    isDisabled={page >= totalPages}
-                  >
-                    Siguiente
-                  </Button>
-                </Flex>
+                
+                <Pagination 
+                  currentPage={page} 
+                  totalPages={totalPages} 
+                  onPageChange={handlePageChange}
+                  totalItems={totalMovements}
+                  itemsPerPage={limit}
+                  showItemCount={true}
+                />
               </>
             )}
           </Box>

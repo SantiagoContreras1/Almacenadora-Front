@@ -28,7 +28,6 @@ import {
   CardBody,
   SimpleGrid,
   Select,
-  useToast
 } from "@chakra-ui/react";
 import { SideBar } from "../components/dashboard/SideBar";
 import { TopBar } from "../components/dashboard/TopBar";
@@ -36,13 +35,26 @@ import { FaTruck, FaSearch, FaPlus } from "react-icons/fa";
 import SupplierForm from "../components/suppliers/SupplierForm";
 import SupplierList from "../components/suppliers/SupplierList";
 import { useSuppliers } from "../shared/hooks/useSuppliers";
+import Pagination from "../components/Pagination";
 
 const SuppliersPage = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [search, setSearch] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const toast = useToast();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const totalItems = suppliers.length;
+  const totalPages = Math.ceil(totalItems / limit);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (newLimit) => {
+    setLimit(newLimit);
+    setPage(1);
+  };
 
   const bg = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
@@ -65,24 +77,8 @@ const SuppliersPage = () => {
   const handleSave = async (data) => {
     if (selectedSupplier) {
       await updateSupplier(selectedSupplier.uid, data);
-      toast({
-        title: "Proveedor actualizado",
-        description: "El proveedor ha sido actualizado con éxito.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-        position: "bottom-right",
-      });
     } else {
       await saveSupplier(data);
-      toast({
-        title: "Proveedor agregado",
-        description: "El proveedor ha sido registrado con éxito.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-        position: "bottom-right",
-      });
     }
     fetchData();
     onClose();
@@ -93,17 +89,9 @@ const SuppliersPage = () => {
     onOpen();
   };
 
-  const handleDelete = async (id, name) => {
+  const handleDelete = async (id) => {
     await deleteSupplier(id);
     fetchData();
-    toast({
-      title: "Proveedor eliminado",
-      description: `${name} ha sido eliminado correctamente.`,
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-      position: "bottom-right",
-    });
   };
 
   const handleOpenCreate = () => {
@@ -182,6 +170,15 @@ const SuppliersPage = () => {
             </CardBody>
           </Card>
         </Box>
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={totalItems}
+          itemsPerPage={limit}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          showItemCount={true}
+        />
       </Box>
 
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
