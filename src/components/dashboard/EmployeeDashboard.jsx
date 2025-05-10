@@ -20,7 +20,7 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     const movementsFromApi = await getMovements(10)
     if ( movementsFromApi) {
-      setMovements(movementsFromApi)
+      setMovements(movementsFromApi.movements)
     }
   };
 

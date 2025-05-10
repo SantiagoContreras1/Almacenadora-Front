@@ -16,14 +16,6 @@ const UserCard = ({ user, onEdit, onDelete }) => {
         <Badge colorScheme={user.role === "ADMIN_ROLE" ? "purple" : "blue"}>
           {roleLabel}
         </Badge>
-        <Badge
-          colorScheme={user.estado ? "green" : "red"}
-          variant="solid"
-          borderRadius="full"
-          px="2"
-        >
-          {user.estado ? "Activo" : "Inactivo"}
-        </Badge>
         <HStack spacing={2} mt={3}>
           <Button colorScheme="teal" size="sm" onClick={() => onEdit(user)}>
             Editar
